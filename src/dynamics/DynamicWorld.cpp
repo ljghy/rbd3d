@@ -8,33 +8,48 @@
 namespace rbd3d
 {
 
-DynamicWorld::DynamicWorld(std::unique_ptr<SolverBase> &&_solver,
-                           const glm::vec3 &_gravity,
-                           uint32_t _substeps)
-    : m_solver(std::move(_solver)),
-      m_gravity(_gravity),
-      m_substeps(glm::max(1u, _substeps))
+DynamicWorld::DynamicWorld(const glm::vec3 &_gravity,
+                           float solverBias,
+                           float solverTol,
+                           uint32_t solverIters)
+    : m_gravity(_gravity),
+      m_solver(solverBias, solverTol, solverIters),
+      m_accumulator(0.f)
 
 {
+}
+
+void DynamicWorld::resetAccumulator()
+{
+    m_accumulator = 0.f;
+}
+
+float DynamicWorld::fixedUpdate(float deltaTime)
+{
+    float dur = 0.f;
+    m_accumulator += deltaTime;
+    while (m_accumulator >= deltaTime)
+    {
+        dur += update(deltaTime);
+        m_accumulator -= deltaTime;
+    }
+    return dur;
 }
 
 float DynamicWorld::update(float deltaTime)
 {
     auto start = std::chrono::high_resolution_clock::now();
-    float dt = deltaTime / m_substeps;
 
-    for (uint32_t i = 0; i < m_substeps; ++i)
-    {
-        clearForce();
-        applyExtForce();
+    clearForce();
+    applyExtForce();
 
-        m_constraints.clear();
-        detectCollision();
+    m_constraints.clear();
+    detectCollision();
 
-        solveConstraints(dt);
+    solveConstraints(deltaTime);
 
-        integrate(dt);
-    }
+    integrate(deltaTime);
+
     auto end = std::chrono::high_resolution_clock::now();
     float dur = static_cast<std::chrono::duration<float>>(end - start).count();
     return dur;
@@ -42,7 +57,7 @@ float DynamicWorld::update(float deltaTime)
 
 void DynamicWorld::solveConstraints(float deltaTime)
 {
-    m_solver->solve(m_constraints, deltaTime);
+    m_solver.solve(m_constraints, deltaTime);
 }
 
 void DynamicWorld::clearForce()
@@ -73,21 +88,28 @@ void DynamicWorld::detectCollision()
     {
         for (size_t j = 0; j < i; ++j)
         {
-            auto info = collisionInfo(*m_rigidbodyList[i], *m_rigidbodyList[j]);
-            if (info.happen)
+            auto manifold = collision(*m_rigidbodyList[i], *m_rigidbodyList[j]);
+            for (int k = 0; k < manifold.pointCount; ++k)
             {
-                m_constraints.push_back(std::make_unique<ContactConstraint>(info));
+                m_constraints.push_back(std::make_unique<ContactConstraint>(m_rigidbodyList[i], m_rigidbodyList[j],
+                                                                            manifold.normal,
+                                                                            manifold.contactPoints[k].depth,
+                                                                            manifold.contactPoints[k].position));
 
-                if (info.rigidbodyA->friction() * info.rigidbodyB->friction() > 0.f)
+                if (m_rigidbodyList[i]->friction() * m_rigidbodyList[j]->friction() > 0.f)
                 {
-                    glm::vec3 an = glm::abs(info.normal), t1, t2;
-                    if (an.x > an.y && an.x > an.z)
-                        t1 = glm::normalize(glm::vec3(-info.normal.y / info.normal.x, 1.f, 0.f));
+                    glm::vec3 t1, t2;
+                    if (manifold.normal.x >= 0.57735f)
+                        t1 = glm::vec3(manifold.normal.y, -manifold.normal.x, 0.f);
                     else
-                        t1 = glm::normalize(an.y > an.z ? glm::vec3(1.f, -info.normal.x / info.normal.y, 0.f) : glm::vec3(1.f, 0.f, -info.normal.x / info.normal.z));
-                    t2 = glm::cross(info.normal, t1);
-                    m_constraints.push_back(std::make_unique<FrictionConstraint>(info, t1));
-                    m_constraints.push_back(std::make_unique<FrictionConstraint>(info, t2));
+                        t1 = glm::vec3(0.f, manifold.normal.z, -manifold.normal.y);
+
+                    t1 = glm::normalize(t1);
+                    t2 = glm::cross(manifold.normal, t1);
+                    m_constraints.push_back(std::make_unique<FrictionConstraint>(m_rigidbodyList[i], m_rigidbodyList[j],
+                                                                                 manifold.contactPoints[k].position, t1));
+                    m_constraints.push_back(std::make_unique<FrictionConstraint>(m_rigidbodyList[i], m_rigidbodyList[j],
+                                                                                 manifold.contactPoints[k].position, t2));
                 }
             }
         }
@@ -96,7 +118,7 @@ void DynamicWorld::detectCollision()
 
 void DynamicWorld::integrate(float deltaTime)
 {
-    for (auto &r : m_rigidbodyList)
+    for (RigidbodyBase *r : m_rigidbodyList)
     {
         r->setVelocity(r->velocity() + r->invMass() * r->force() * deltaTime);
         r->setAngularVelocity(r->angularVelocity() + r->invInertia() * r->torque() * deltaTime);

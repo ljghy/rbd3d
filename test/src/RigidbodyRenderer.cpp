@@ -22,7 +22,7 @@ RigidbodyRenderer::RigidbodyRenderer()
         "\n"
         "void main()\n"
         "{\n"
-        "    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));\n"
+        "    vec3 lightDir = normalize(vec3(1.5, 2.0, 1.0));\n"
         "    vec3 lightColor= vec3(0.8, 0.8, 0.8);\n"
         "    vec3 ambient = vec3(0.5, 0.5, 0.5);\n"
         "    color = vec4(u_diffuse * (max(dot(norm, lightDir), 0.0) * lightColor + ambient), 1.0);\n"

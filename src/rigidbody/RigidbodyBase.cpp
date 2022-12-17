@@ -154,7 +154,7 @@ void RigidbodyBase::addTorque(const glm::vec3 &torque)
     m_torque += torque;
 }
 
-float RigidbodyBase::resilience() const
+float RigidbodyBase::restitution() const
 {
     return m_restitution;
 }

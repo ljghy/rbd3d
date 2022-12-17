@@ -2,8 +2,7 @@
 #include <imgui.h>
 
 TestPyramid::TestPyramid()
-    : m_world(std::make_unique<rbd3d::SISolver>()),
-      m_cube{{glm::vec3(1.6f, 0.9f, 1.f)},
+    : m_cube{{glm::vec3(1.6f, 0.9f, 1.f)},
              {glm::vec3(1.6f, 0.9f, 1.f)},
              {glm::vec3(1.6f, 0.9f, 1.f)},
              {glm::vec3(1.6f, 0.9f, 1.f)},
@@ -33,14 +32,14 @@ TestPyramid::TestPyramid()
         m_cubeRenderer[i].create(m_cube[i]);
     m_groundRenderer.create(m_ground);
 
+    m_world.addRigidbody(m_ground);
     for (auto &c : m_cube)
         m_world.addRigidbody(c);
-    m_world.addRigidbody(m_ground);
 }
 
 void TestPyramid::onUpdate(float deltaTime)
 {
-    m_updateDur = m_world.update(deltaTime);
+    m_updateDur = m_world.fixedUpdate(0.02f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))
@@ -85,5 +84,5 @@ void TestPyramid::onImGuiRender()
     static float groundFriction = 5.f;
     ImGui::SliderFloat("Ground Friction", &groundFriction, 0.f, 10.f);
     m_ground.setFriction(groundFriction);
-    ImGui::Text("Physics: %f ms", m_updateDur * 1e3f);
+    ImGui::Text("Physics: %.2f ms", m_updateDur * 1e3f);
 }

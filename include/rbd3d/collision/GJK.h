@@ -17,7 +17,7 @@ struct SimplexVert
 using Simplex = std::array<SimplexVert, 4>;
 
 SimplexVert support(const RigidbodyBase &a, const RigidbodyBase &b, const glm::vec3 &dir);
-bool collision(const RigidbodyBase &a, const RigidbodyBase &b, SimplexVert * = nullptr);
+bool GJK(const RigidbodyBase &a, const RigidbodyBase &b, SimplexVert * = nullptr);
 
 } // namespace rbd3d
 

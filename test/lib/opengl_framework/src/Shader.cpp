@@ -6,11 +6,11 @@ Shader::Shader() : m_id(0) {}
 
 Shader::Shader(Shader &&other) : m_id(other.m_id) { other.m_id = 0; }
 
-void Shader::create(const char *vertSrc, const char *fragSrc)
+void Shader::create(const char *vertSrc, const char *fragSrc, const char *geometrySrc)
 {
     destroy();
 
-    unsigned int vert, frag;
+    unsigned int vert, frag, geometry;
     int success;
     char infoLog[512];
 
@@ -34,9 +34,24 @@ void Shader::create(const char *vertSrc, const char *fragSrc)
         throw std::runtime_error(std::string("Fragment shader compile error: ") + infoLog);
     };
 
+    if (geometrySrc)
+    {
+        geometry = glCreateShader(GL_GEOMETRY_SHADER);
+        glShaderSource(geometry, 1, &geometrySrc, NULL);
+        glCompileShader(geometry);
+        glGetShaderiv(geometry, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(geometry, 512, NULL, infoLog);
+            throw std::runtime_error(std::string("Geometry shader compile error: ") + infoLog);
+        };
+    }
+
     m_id = glCreateProgram();
     glAttachShader(m_id, vert);
     glAttachShader(m_id, frag);
+    if (geometrySrc)
+        glAttachShader(m_id, geometry);
     glLinkProgram(m_id);
 
     glGetProgramiv(m_id, GL_LINK_STATUS, &success);
@@ -48,6 +63,8 @@ void Shader::create(const char *vertSrc, const char *fragSrc)
 
     glDeleteShader(vert);
     glDeleteShader(frag);
+    if (geometrySrc)
+        glDeleteShader(geometry);
 }
 
 void Shader::use() const { glUseProgram(m_id); }

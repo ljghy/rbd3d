@@ -17,6 +17,8 @@ enum class RigidbodyType
 class RigidbodyBase
 {
 public:
+    friend class SequencialImpulseSolver;
+
     RigidbodyBase(float _mass = 1.f,
                   float _restitution = 0.5f,
                   float _friction = 0.5f,
@@ -42,7 +44,7 @@ public:
     float invMass() const;
     const glm::mat3 &invInertia() const;
 
-    float resilience() const;
+    float restitution() const;
     void setRestitution(float);
 
     float friction() const;

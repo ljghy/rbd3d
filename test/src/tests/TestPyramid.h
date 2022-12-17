@@ -28,6 +28,7 @@ private:
     Camera m_camera;
 
     float m_updateDur;
+
 };
 
 #endif

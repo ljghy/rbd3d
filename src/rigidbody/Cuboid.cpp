@@ -18,7 +18,7 @@ Cuboid::Cuboid(const glm::vec3 &_size,
 
 glm::vec3 Cuboid::support(const glm::vec3 &dir) const
 {
-    glm::vec3 localDir = glm::inverse(rotation()) * dir;
+    glm::vec3 localDir = glm::conjugate(m_rotation) * dir;
     glm::vec3 s(0.f);
     if (localDir.x > 0)
         s.x = m_size.x;
@@ -28,7 +28,25 @@ glm::vec3 Cuboid::support(const glm::vec3 &dir) const
         s.z = m_size.z;
     s -= 0.5f * m_size;
 
-    s = translation() + rotation() * s;
+    s = m_translation + m_rotation * s;
+
+    return s;
+}
+
+glm::vec3 Cuboid::support(const glm::vec3 &dir, glm::vec3 &sgn) const
+{
+    glm::vec3 localDir = glm::conjugate(m_rotation) * dir;
+    glm::vec3 s(0.f);
+    sgn = glm::vec3(-1.f, -1.f, -1.f);
+    for (int i = 0; i < 3; ++i)
+        if (localDir[i] > 0)
+        {
+            sgn[i] = 1;
+            s[i] = m_size[i];
+        }
+    s -= 0.5f * m_size;
+
+    s = m_translation + m_rotation * s;
 
     return s;
 }

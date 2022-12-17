@@ -17,6 +17,7 @@ public:
            const glm::vec3 &_initialVelocity = glm::vec3(0.f),
            const glm::vec3 &_initialAngularVelocity = glm::vec3(0.f));
     virtual glm::vec3 support(const glm::vec3 &dir) const override;
+    glm::vec3 support(const glm::vec3 &dir, glm::vec3 &sgn) const;
 
     virtual RigidbodyType type() const override { return RigidbodyType::CUBOID; }
 

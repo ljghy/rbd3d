@@ -3,7 +3,6 @@
 
 #include <rbd3d/collision.h>
 #include <rbd3d/constraint.h>
-#include <rbd3d/solver.h>
 
 #include <rbd3d/dynamics/DynamicWorld.h>
 

@@ -3,43 +3,19 @@
 namespace rbd3d
 {
 
-FrictionConstraint::FrictionConstraint(const CollisionInfo &info,
-                                       const glm::vec3 &_tangent)
-    : ConstraintBase(info.rigidbodyA, info.rigidbodyB),
-      tangent(_tangent),
-      pa(info.contactPointA),
-      pb(info.contactPointB)
+FrictionConstraint::FrictionConstraint(RigidbodyBase *a,
+                                       RigidbodyBase *b,
+                                       const glm::vec3 &position,
+                                       const glm::vec3 &tangent)
+    : ConstraintBase(a, b)
 {
-}
-
-glm::vec3 FrictionConstraint::va() const
-{
-    return -tangent;
-}
-
-glm::vec3 FrictionConstraint::wa() const
-{
-    return glm::cross(tangent, pa - a->translation());
-}
-
-glm::vec3 FrictionConstraint::vb() const
-{
-    return tangent;
-}
-
-glm::vec3 FrictionConstraint::wb() const
-{
-    return glm::cross(pb - b->translation(), tangent);
-}
-
-glm::vec2 FrictionConstraint::bound() const
-{
+    va = -tangent;
+    wa = glm::cross(tangent, position - a->translation());
+    vb = tangent;
+    wb = glm::cross(position - b->translation(), tangent);
     float fm = a->friction() * b->friction();
-    return {-fm, fm};
-}
-
-float FrictionConstraint::vel() const
-{
-    return 0.f;
+    bound = glm::vec2(-fm, fm);
+    vel = 0.f;
+    res = 0.f;
 }
 } // namespace rbd3d

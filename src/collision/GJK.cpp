@@ -1,4 +1,4 @@
-#include <rbd3d/rigidbody/GJK.h>
+#include <rbd3d/collision/GJK.h>
 
 namespace rbd3d
 {
@@ -125,7 +125,7 @@ static bool updateSimplex(Simplex &simplex, size_t &simplexDim, glm::vec3 &dir)
 
 constexpr int GJK_MAX_ITER = 64;
 
-bool collision(const RigidbodyBase &a, const RigidbodyBase &b, SimplexVert *pSimplex)
+bool GJK(const RigidbodyBase &a, const RigidbodyBase &b, SimplexVert *pSimplex)
 {
     auto sup = support(a, b, glm::vec3(1.f, 0.f, 0.f));
 
@@ -136,11 +136,9 @@ bool collision(const RigidbodyBase &a, const RigidbodyBase &b, SimplexVert *pSim
     glm::vec3 dir = -sup.vert;
 
     int iter = 0;
-    while (true)
+    while (iter < GJK_MAX_ITER)
     {
         ++iter;
-        if (iter > GJK_MAX_ITER)
-            return false;
 
         sup = support(a, b, dir);
         if (glm::dot(sup.vert, dir) < 0)

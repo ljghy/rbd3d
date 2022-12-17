@@ -4,42 +4,17 @@
 namespace rbd3d
 {
 
-ContactConstraint::ContactConstraint(const CollisionInfo &info)
-    : ConstraintBase(info.rigidbodyA, info.rigidbodyB),
-      normal(info.normal), depth(info.depth),
-      pa(info.contactPointA),
-      pb(info.contactPointB)
+ContactConstraint::ContactConstraint(RigidbodyBase *a, RigidbodyBase *b,
+                                     const glm::vec3 &normal, float depth, const glm::vec3 &position)
+    : ConstraintBase(a, b)
 {
-}
-
-glm::vec3 ContactConstraint::va() const
-{
-    return -normal;
-}
-
-glm::vec3 ContactConstraint::wa() const
-{
-    return glm::cross(normal, pa - a->translation());
-}
-
-glm::vec3 ContactConstraint::vb() const
-{
-    return normal;
-}
-
-glm::vec3 ContactConstraint::wb() const
-{
-    return glm::cross(pb - b->translation(), normal);
-}
-
-glm::vec2 ContactConstraint::bound() const
-{
-    return {0.f, std::numeric_limits<float>::max()};
-}
-
-float ContactConstraint::vel() const
-{
-    return depth;
+    va = -normal;
+    wa = glm::cross(normal, position - a->translation());
+    vb = normal;
+    wb = glm::cross(position - b->translation(), normal);
+    bound = glm::vec2(0.f, std::numeric_limits<float>::max());
+    vel = depth;
+    res = glm::max(a->restitution(), b->restitution());
 }
 
 } // namespace rbd3d

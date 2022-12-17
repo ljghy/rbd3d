@@ -12,7 +12,7 @@ public:
     Shader();
     ~Shader();
 
-    void create(const char *vertSrc, const char *fragSrc);
+    void create(const char *vertSrc, const char *fragSrc, const char *geometrySrc = nullptr);
 
     Shader(const Shader &) = delete;
     Shader &operator=(const Shader &) = delete;

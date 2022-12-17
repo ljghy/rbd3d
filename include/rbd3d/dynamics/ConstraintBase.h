@@ -10,12 +10,13 @@ struct ConstraintBase
     RigidbodyBase *a;
     RigidbodyBase *b;
 
-    virtual glm::vec3 va() const = 0;
-    virtual glm::vec3 wa() const = 0;
-    virtual glm::vec3 vb() const = 0;
-    virtual glm::vec3 wb() const = 0;
-    virtual glm::vec2 bound() const = 0;
-    virtual float vel() const = 0;
+    glm::vec3 va;
+    glm::vec3 wa;
+    glm::vec3 vb;
+    glm::vec3 wb;
+    glm::vec2 bound;
+    float vel;
+    float res;
 
     ConstraintBase(RigidbodyBase *_a, RigidbodyBase *_b) : a(_a), b(_b) {}
 

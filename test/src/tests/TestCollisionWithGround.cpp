@@ -2,10 +2,9 @@
 #include <imgui.h>
 
 TestCollisionWithGround::TestCollisionWithGround()
-    : m_world(std::make_unique<rbd3d::SISolver>()),
-      m_cube{{glm::vec3(1.8f), 10.f}, glm::vec3(1.f), glm::vec3(0.5f)},
+    : m_cube{{glm::vec3(1.8f), 10.f}, glm::vec3(1.f), glm::vec3(0.5f)},
       m_sphere(0.5f),
-      m_ground(glm::vec3(0.05f, 1.f, 0.f))
+      m_ground(glm::vec3(0.0f, 1.f, 0.f))
 {
     m_cube[0].setTranslation(glm::vec3(0.f, 1.f, 0.f));
     m_cube[1].setTranslation(glm::vec3(0.f, 2.6f, 0.f));
@@ -17,15 +16,15 @@ TestCollisionWithGround::TestCollisionWithGround()
     m_sphereRenderer.create(m_sphere);
     m_groundRenderer.create(m_ground);
 
+    m_world.addRigidbody(m_sphere);
     for (auto &c : m_cube)
         m_world.addRigidbody(c);
-    m_world.addRigidbody(m_sphere);
     m_world.addRigidbody(m_ground);
 }
 
 void TestCollisionWithGround::onUpdate(float deltaTime)
 {
-    m_world.update(deltaTime);
+    m_world.fixedUpdate(0.02f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))
