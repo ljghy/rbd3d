@@ -74,4 +74,29 @@ void Cuboid::setInertia()
     }
 }
 
+AABB Cuboid::tightAABB() const
+{
+    glm::vec3 r(0.f), h(0.5f * m_size);
+    glm::vec3 sgn[]{{1.f, 1.f, 1.f},
+                    {1.f, 1.f, -1.f},
+                    {1.f, -1.f, -1.f},
+                    {1.f, -1.f, 1.f}};
+    for (const auto &s : sgn)
+        r = glm::max(glm::abs(m_rotation * (s * h)), r);
+    return {m_translation - r, m_translation + r};
+}
+
+AABB Cuboid::enlargedAABB(float scale) const
+{
+    glm::vec3 r(0.f), h(0.5f * m_size);
+    glm::vec3 sgn[]{{1.f, 1.f, 1.f},
+                    {1.f, 1.f, -1.f},
+                    {1.f, -1.f, -1.f},
+                    {1.f, -1.f, 1.f}};
+    for (const auto &s : sgn)
+        r = glm::max(glm::abs(m_rotation * (s * h)), r);
+    r *= scale;
+    return {m_translation - r, m_translation + r};
+}
+
 } // namespace rbd3d

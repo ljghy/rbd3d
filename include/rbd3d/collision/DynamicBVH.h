@@ -2,39 +2,43 @@
 #define RBD3D_COLLISION_DYNAMIC_BVH_H_
 
 #include <rbd3d/collision/AABB.h>
-
+#include <rbd3d/rigidbody/RigidbodyBase.h>
 #include <vector>
 
 namespace rbd3d
 {
 
-constexpr int nullIndex = -1;
+extern const int nullIndex;
 
 struct BVHNode
 {
+
     AABB aabb;
-    int index;
+    RigidbodyBase *rigidbody;
     int parent;
     int child1;
     int child2;
 
-    BVHNode(const AABB &_aabb,
-            int _index = nullIndex,
-            int _parent = nullIndex,
-            int _child1 = nullIndex,
-            int _child2 = nullIndex)
-        : aabb(_aabb), index(_index), parent(_parent), child1(_child1), child2(_child2)
-    {
-    }
+    BVHNode(const AABB &_aabb, RigidbodyBase *_rigidbody = nullptr,
+            int _parent = nullIndex, int _child1 = nullIndex, int _child2 = nullIndex)
+        : aabb(_aabb), rigidbody(_rigidbody), parent(_parent), child1(_child1), child2(_child2) {}
 };
 
 class DynamicBVH
 {
 public:
-    void insertLeaf(const AABB &aabb, int index);
+    DynamicBVH();
+    void insertLeaf(const AABB &aabb, RigidbodyBase *rigidbody);
+    void update();
+    void detectCollision(RigidbodyBase *rigidbody, std::vector<RigidbodyBase *> &collisions);
 
 private:
     float inheritedAreaDiff(AABB aabb, int index);
+
+    void removeAndInsert(int index, const AABB &newAABB);
+    void insertLeafAt(int leafIndex, int newParent, const AABB &aabb, RigidbodyBase *rigidbody);
+    void refit(int index);
+    void detectCollision(RigidbodyBase *rigidbody, const AABB &aabb, std::vector<RigidbodyBase *> &collisions, int index);
 
 private:
     std::vector<BVHNode> m_nodes;

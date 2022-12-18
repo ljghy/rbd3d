@@ -38,4 +38,16 @@ void Sphere::setInertia()
     m_invInertia = glm::mat3(1.f / I);
 }
 
+AABB Sphere::tightAABB() const
+{
+    glm::vec3 r = glm::vec3(m_radius);
+    return {m_translation - r, m_translation + r};
+}
+
+AABB Sphere::enlargedAABB(float scale) const
+{
+    glm::vec3 r = glm::vec3(m_radius) * scale;
+    return {m_translation - r, m_translation + r};
+}
+
 }; // namespace rbd3d

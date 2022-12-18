@@ -85,7 +85,8 @@ public:
 
     virtual glm::vec3 support(const glm::vec3 &dir) const = 0;
 
-    // virtual AABB tightAABB() const = 0;
+    virtual AABB tightAABB() const = 0;
+    virtual AABB enlargedAABB(float scale) const = 0;
 
     RigidbodyType type() const;
     void setType(RigidbodyType ty);

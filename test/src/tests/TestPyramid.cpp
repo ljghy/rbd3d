@@ -2,8 +2,8 @@
 #include <imgui.h>
 
 TestPyramid::TestPyramid()
-    : m_ground(glm::vec3(100.f, 0.5f, 100.f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, -0.25f, 0.f)),
-      m_wall(glm::vec3(100.f, 50.f, 0.5f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, 25.f, -5.f)),
+    : m_ground(glm::vec3(40.f, 0.5f, 20.f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, -0.25f, 0.f)),
+      m_wall(glm::vec3(40.f, 20.f, 0.5f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, 10.f, -5.f)),
       m_sphere(0.5f, 10.f)
 {
     m_wall.setType(rbd3d::RigidbodyType::STATIC);
@@ -17,7 +17,7 @@ TestPyramid::TestPyramid()
             m_cubeRenderer[k].create(m_cube[k]);
         }
     m_sphere.setTranslation(glm::vec3(0.f, 5.f, 5.f));
-    m_sphere.setVelocity(glm::vec3(0.f, 0.f, -10.f));
+    m_sphere.setVelocity(glm::vec3(0.f, 0.f, -20.f));
 
     m_groundRenderer.create(m_ground);
     m_wallRenderer.create(m_wall);
@@ -29,13 +29,13 @@ TestPyramid::TestPyramid()
         m_world.addRigidbody(c);
     m_world.addRigidbody(m_sphere);
 
-    m_camera.pos = glm::vec3(8.f, 6.f, 5.f);
-    m_camera.rotate(-60.f, 0.f);
+    m_camera.pos = glm::vec3(8.f, 15.f, 15.f);
+    m_camera.rotate(-30.f, 0.f);
 }
 
 void TestPyramid::onUpdate(float deltaTime)
 {
-    m_updateDur = m_world.fixedUpdate(deltaTime, 1.f / 60.f);
+    m_updateDur = m_world.fixedUpdate(deltaTime, 0.02f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))

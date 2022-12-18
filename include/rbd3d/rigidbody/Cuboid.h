@@ -24,6 +24,9 @@ public:
     glm::vec3 size() const;
     void setSize(const glm::vec3 &);
 
+    virtual AABB tightAABB() const override;
+    virtual AABB enlargedAABB(float scale) const override;
+
 protected:
     virtual void setInertia() override;
 

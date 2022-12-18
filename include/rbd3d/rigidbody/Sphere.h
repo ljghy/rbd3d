@@ -22,6 +22,9 @@ public:
     float radius() const;
     void setRadius(float);
 
+    virtual AABB tightAABB() const override;
+    virtual AABB enlargedAABB(float scale) const override;
+
 protected:
     virtual void setInertia() override;
 

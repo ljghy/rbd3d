@@ -5,6 +5,8 @@
 #include <rbd3d/constraint.h>
 #include <rbd3d/dynamics/SequentialImpulseSolver.h>
 
+#include <rbd3d/collision/DynamicBVH.h>
+
 #include <vector>
 #include <memory>
 
@@ -15,8 +17,8 @@ class DynamicWorld
 public:
     DynamicWorld(const glm::vec3 &_gravity = glm::vec3(0.f, -9.8f, 0.f),
                  float solverBias = 0.1f,
-                 float solverTol = 1e-5f,
-                 uint32_t solverIters = 64u);
+                 float solverTol = 1e-4f,
+                 uint32_t solverIters = 32u);
 
     float update(float deltaTime);
     float fixedUpdate(float deltaTime, float fixedDeltaTime);
@@ -31,12 +33,10 @@ private:
     void applyExtForce();
     void applyGravity();
     void detectCollision();
-
     void solveConstraints(float deltaTime);
-
     void integrate(float deltaTime);
-
     void resetAccumulator();
+    void updateBVH();
 
 private:
     std::vector<RigidbodyBase *> m_rigidbodyList;
@@ -46,6 +46,8 @@ private:
     std::vector<std::unique_ptr<ConstraintBase>> m_constraints;
 
     SequentialImpulseSolver m_solver;
+
+    DynamicBVH m_BVH;
 
     float m_accumulator;
 };
