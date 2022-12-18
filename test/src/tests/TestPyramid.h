@@ -19,16 +19,21 @@ public:
 private:
     rbd3d::DynamicWorld m_world;
 
-    rbd3d::Cuboid m_cube[10];
-    rbd3d::Plane m_ground;
+    static constexpr uint32_t layers = 10;
 
-    RigidbodyRenderer m_cubeRenderer[10];
+    rbd3d::Cuboid m_cube[(layers + 1) * layers / 2];
+    rbd3d::Plane m_ground;
+    rbd3d::Plane m_wall;
+    rbd3d::Sphere m_sphere;
+
+    RigidbodyRenderer m_cubeRenderer[(layers + 1) * layers / 2];
     RigidbodyRenderer m_groundRenderer;
+    RigidbodyRenderer m_wallRenderer;
+    RigidbodyRenderer m_sphereRenderer;
 
     Camera m_camera;
 
     float m_updateDur;
-
 };
 
 #endif

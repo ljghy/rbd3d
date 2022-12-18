@@ -2,44 +2,38 @@
 #include <imgui.h>
 
 TestPyramid::TestPyramid()
-    : m_cube{{glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)},
-             {glm::vec3(1.6f, 0.9f, 1.f)}},
-      m_ground(glm::vec3(0.f, 1.f, 0.f))
+    : m_ground(glm::vec3(0.f, 1.f, 0.f)),
+      m_wall(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -4.f)),
+      m_sphere(0.5f, 5.f)
 {
-    m_cube[0].setTranslation(glm::vec3(-3.f, 0.5f, 0.f));
-    m_cube[1].setTranslation(glm::vec3(-1.f, 0.5f, 0.f));
-    m_cube[2].setTranslation(glm::vec3(1.f, 0.5f, 0.f));
-    m_cube[3].setTranslation(glm::vec3(3.f, 0.5f, 0.f));
+    for (int i = 0; i < layers; ++i)
+        for (int j = 0; j <= i; ++j)
+        {
+            int k = (i + 1) * i / 2 + j;
+            m_cube[k].setSize(glm::vec3(0.9f, 0.5f, 0.5f));
+            m_cube[k].setTranslation(glm::vec3(-0.5f * i + j, 0.5f * (layers - i) - 0.25f, 0.f));
+            m_cubeRenderer[k].create(m_cube[k]);
+        }
+    m_sphere.setTranslation(glm::vec3(0.f, 3.f, 5.f));
+    m_sphere.setVelocity(glm::vec3(0.f, 0.f, -10.f));
 
-    m_cube[4].setTranslation(glm::vec3(-2.f, 1.5f, 0.f));
-    m_cube[5].setTranslation(glm::vec3(0.f, 1.5f, 0.f));
-    m_cube[6].setTranslation(glm::vec3(2.f, 1.5f, 0.f));
-
-    m_cube[7].setTranslation(glm::vec3(-1.f, 2.5f, 0.f));
-    m_cube[8].setTranslation(glm::vec3(1.f, 2.5f, 0.f));
-
-    m_cube[9].setTranslation(glm::vec3(0.f, 3.5f, 0.f));
-
-    for (size_t i = 0; i < 10; ++i)
-        m_cubeRenderer[i].create(m_cube[i]);
     m_groundRenderer.create(m_ground);
+    m_wallRenderer.create(m_wall);
+    m_sphereRenderer.create(m_sphere);
 
     m_world.addRigidbody(m_ground);
+    m_world.addRigidbody(m_wall);
     for (auto &c : m_cube)
         m_world.addRigidbody(c);
+    m_world.addRigidbody(m_sphere);
+
+    m_camera.pos = glm::vec3(8.f, 6.f, 5.f);
+    m_camera.rotate(-60.f, 0.f);
 }
 
 void TestPyramid::onUpdate(float deltaTime)
 {
-    m_updateDur = m_world.fixedUpdate(0.02f);
+    m_updateDur = m_world.fixedUpdate(deltaTime, 0.02f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))
@@ -74,9 +68,18 @@ void TestPyramid::onRender(int viewportWidth, int viewportHeight)
     glClearColor(0.9f, 0.9f, 0.9f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (int i = 0; i < 10; ++i)
-        m_cubeRenderer[i].render(viewportWidth, viewportHeight, m_camera, glm::vec3(1.f - 0.1f * i, 0.1f * i, 0.5f));
+    for (int i = 0; i < layers; ++i)
+        for (int j = 0; j <= i; ++j)
+        {
+            int k = (i + 1) * i / 2 + j;
+            float Ek = 0.5f * m_cube[k].mass() * glm::dot(m_cube[k].velocity(), m_cube[k].velocity()) +
+                       0.5f * glm::dot(m_cube[k].angularVelocity(), m_cube[k].inertia() * m_cube[k].angularVelocity());
+            float r = 1.f - glm::exp(-Ek);
+            m_cubeRenderer[k].render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f + 0.8f * r, 0.6f * (1.f - r), 0.2f));
+        }
     m_groundRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.1f, 0.3f, 0.5f));
+    m_wallRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.1f, 0.3f, 0.5f));
+    m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.8f, 1.f, 0.2f));
 }
 
 void TestPyramid::onImGuiRender()

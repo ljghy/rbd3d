@@ -58,7 +58,7 @@ TestCollisionDetection::TestCollisionDetection()
 
 void TestCollisionDetection::onUpdate(float deltaTime)
 {
-    m_cm = rbd3d::collision(m_cube, m_sphere);
+    m_cm = rbd3d::collision(m_cube, m_ground);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))

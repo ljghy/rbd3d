@@ -24,14 +24,14 @@ void DynamicWorld::resetAccumulator()
     m_accumulator = 0.f;
 }
 
-float DynamicWorld::fixedUpdate(float deltaTime)
+float DynamicWorld::fixedUpdate(float deltaTime, float fixedDeltaTime)
 {
     float dur = 0.f;
     m_accumulator += deltaTime;
-    while (m_accumulator >= deltaTime)
+    while (m_accumulator >= fixedDeltaTime)
     {
-        dur += update(deltaTime);
-        m_accumulator -= deltaTime;
+        dur += update(fixedDeltaTime);
+        m_accumulator -= fixedDeltaTime;
     }
     return dur;
 }
@@ -89,6 +89,7 @@ void DynamicWorld::detectCollision()
         for (size_t j = 0; j < i; ++j)
         {
             auto manifold = collision(*m_rigidbodyList[i], *m_rigidbodyList[j]);
+
             for (int k = 0; k < manifold.pointCount; ++k)
             {
                 m_constraints.push_back(std::make_unique<ContactConstraint>(m_rigidbodyList[i], m_rigidbodyList[j],
@@ -99,7 +100,7 @@ void DynamicWorld::detectCollision()
                 if (m_rigidbodyList[i]->friction() * m_rigidbodyList[j]->friction() > 0.f)
                 {
                     glm::vec3 t1, t2;
-                    if (manifold.normal.x >= 0.57735f)
+                    if (glm::abs(manifold.normal.x) >= 0.5f)
                         t1 = glm::vec3(manifold.normal.y, -manifold.normal.x, 0.f);
                     else
                         t1 = glm::vec3(0.f, manifold.normal.z, -manifold.normal.y);

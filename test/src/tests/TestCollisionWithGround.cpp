@@ -24,7 +24,7 @@ TestCollisionWithGround::TestCollisionWithGround()
 
 void TestCollisionWithGround::onUpdate(float deltaTime)
 {
-    m_world.fixedUpdate(0.02f);
+    m_world.fixedUpdate(deltaTime, 0.02f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))

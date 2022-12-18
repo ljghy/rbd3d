@@ -56,6 +56,11 @@ glm::vec3 Cuboid::size() const
     return m_size;
 }
 
+void Cuboid::setSize(const glm::vec3 &s)
+{
+    m_size = s;
+}
+
 void Cuboid::setInertia()
 {
     glm::vec3 diag = glm::vec3(glm::dot(m_size, m_size)) - m_size * m_size;

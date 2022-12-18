@@ -7,7 +7,7 @@ namespace rbd3d
 class Sphere : public RigidbodyBase
 {
 public:
-    Sphere(float _radius,
+    Sphere(float _radius = 1.f,
            float _mass = 1.f,
            float _restitution = 0.5f,
            float _friction = 0.5f,
@@ -20,6 +20,7 @@ public:
     virtual RigidbodyType type() const override { return RigidbodyType::SPHERE; }
 
     float radius() const;
+    void setRadius(float);
 
 protected:
     virtual void setInertia() override;

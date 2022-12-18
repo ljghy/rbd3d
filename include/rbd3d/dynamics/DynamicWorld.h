@@ -15,11 +15,11 @@ class DynamicWorld
 public:
     DynamicWorld(const glm::vec3 &_gravity = glm::vec3(0.f, -9.8f, 0.f),
                  float solverBias = 0.1f,
-                 float solverTol = 1e-4f,
-                 uint32_t solverIters = 20u);
+                 float solverTol = 1e-5f,
+                 uint32_t solverIters = 32u);
 
     float update(float deltaTime);
-    float fixedUpdate(float deltaTime);
+    float fixedUpdate(float deltaTime, float fixedDeltaTime);
 
     void addRigidbody(RigidbodyBase &);
 

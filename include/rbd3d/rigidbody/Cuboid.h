@@ -8,7 +8,7 @@ namespace rbd3d
 class Cuboid : public RigidbodyBase
 {
 public:
-    Cuboid(const glm::vec3 &_size,
+    Cuboid(const glm::vec3 &_size = glm::vec3(1.f),
            float _mass = 1.f,
            float _restitution = 0.5f,
            float _friction = 0.5f,
@@ -22,6 +22,7 @@ public:
     virtual RigidbodyType type() const override { return RigidbodyType::CUBOID; }
 
     glm::vec3 size() const;
+    void setSize(const glm::vec3 &);
 
 protected:
     virtual void setInertia() override;

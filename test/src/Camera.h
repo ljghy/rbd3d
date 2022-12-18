@@ -29,7 +29,6 @@ struct Camera
 
     glm::mat4 getViewMatrix() const;
     glm::mat4 getProjMatrix() const;
-    glm::mat4 getOrthoProjMatrix(float left, float right, float bottom, float top) const;
 
     void translate(const glm::vec3 &);
     void rotate(float yaw,  // mouse delta x, degree

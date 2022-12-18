@@ -34,10 +34,10 @@ void SequencialImpulseSolver::solve(const std::vector<std::unique_ptr<Constraint
                        glm::dot(ci->vb, ci->b->m_velocity) +
                        glm::dot(ci->wb, ci->b->m_angularVelocity);
             lambda[i] = (1.f + ci->res) * glm::clamp((m_bias * idt * ci->vel - jv) * mu[i], ci->bound.x * deltaTime, ci->bound.y * deltaTime); // lambda * dt
-            ci->a->applyImpulse(lambda[i] * ci->va);
-            ci->a->applyAngularImpulse(lambda[i] * ci->wa);
-            ci->b->applyImpulse(lambda[i] * ci->vb);
-            ci->b->applyAngularImpulse(lambda[i] * ci->wb);
+            ci->a->m_velocity += ci->a->m_invMass * lambda[i] * ci->va;
+            ci->a->m_angularVelocity += ci->a->m_invInertia * (lambda[i] * ci->wa);
+            ci->b->m_velocity += ci->b->m_invMass * lambda[i] * ci->vb;
+            ci->b->m_angularVelocity += ci->b->m_invInertia * (lambda[i] * ci->wb);
 
             err = glm::max(err, glm::abs(last - lambda[i]));
         }

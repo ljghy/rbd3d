@@ -21,6 +21,11 @@ float Sphere::radius() const
     return m_radius;
 }
 
+void Sphere::setRadius(float r)
+{
+    m_radius = r;
+}
+
 glm::vec3 Sphere::support(const glm::vec3 &dir) const
 {
     return translation() + m_radius * glm::normalize(dir);
