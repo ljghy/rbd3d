@@ -11,7 +11,7 @@ RigidbodyBase::RigidbodyBase(float _mass,
                              const glm::vec3 &_initialVelocity,
                              const glm::vec3 &_initialAngularVelocity)
     : m_mass(_mass),
-      m_invMass(1.f / _mass),
+      m_invMass(_mass > 0 ? 1.f / _mass : 0.f),
       m_inertia(m_mass),
       m_invInertia(m_invMass),
       m_restitution(_restitution),
@@ -21,7 +21,8 @@ RigidbodyBase::RigidbodyBase(float _mass,
       m_velocity(_initialVelocity),
       m_angularVelocity(_initialAngularVelocity),
       m_force(glm::vec3(0.f)),
-      m_torque(glm::vec3(0.f))
+      m_torque(glm::vec3(0.f)),
+      m_type(RigidbodyType::DYNAMIC)
 {
 }
 
@@ -84,7 +85,7 @@ const glm::mat3 &RigidbodyBase::invInertia() const
 void RigidbodyBase::setMass(float mass)
 {
     m_mass = mass;
-    m_invMass = 1.f / mass;
+    m_invMass = mass > 0.f ? 1.f / mass : 0.f;
     setInertia();
 }
 
@@ -172,6 +173,16 @@ float RigidbodyBase::friction() const
 void RigidbodyBase::setFriction(float f)
 {
     m_friction = f;
+}
+
+RigidbodyType RigidbodyBase::type() const
+{
+    return m_type;
+}
+
+void RigidbodyBase::setType(RigidbodyType ty)
+{
+    m_type = ty;
 }
 
 }; // namespace rbd3d

@@ -11,11 +11,10 @@ namespace rbd3d
 {
 
 // Collision Table
-//          Sphere   Capsule   Cuboid   Plane
-// Sphere     O         X        O        O
-// Capsule              X        X        X
-// Cuboid                        O        O
-// Hull                                   -
+//          Sphere   Capsule   Cuboid 
+// Sphere     O         X        O    
+// Capsule              X        X    
+// Cuboid                        O    
 
 ContactManifold collision(const RigidbodyBase &a, const RigidbodyBase &b);
 
@@ -32,28 +31,8 @@ inline ContactManifold collision(const Cuboid &a, const Sphere &b)
     return ret;
 }
 
-// Sphere vs Plane
-ContactManifold collision(const Sphere &a, const Plane &b);
-inline ContactManifold collision(const Plane &a, const Sphere &b)
-{
-    ContactManifold ret = collision(b, a);
-    if (ret.pointCount)
-        ret.normal = -ret.normal;
-    return ret;
-}
-
 // Cuboid vs Cuboid
 inline ContactManifold collision(const Cuboid &a, const Cuboid &b) { return cuboidContact(a, b); }
-
-// Cuboid vs Plane
-ContactManifold collision(const Cuboid &a, const Plane &b);
-inline ContactManifold collision(const Plane &a, const Cuboid &b)
-{
-    auto ret = collision(b, a);
-    if (ret.pointCount)
-        ret.normal = -ret.normal;
-    return ret;
-}
 
 } // namespace rbd3d
 

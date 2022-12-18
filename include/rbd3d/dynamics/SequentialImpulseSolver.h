@@ -9,10 +9,10 @@
 
 namespace rbd3d
 {
-class SequencialImpulseSolver
+class SequentialImpulseSolver
 {
 public:
-    SequencialImpulseSolver(float _bias, float _tol, uint32_t _iters) : m_bias(_bias), m_tol(_tol), m_iters(_iters) {}
+    SequentialImpulseSolver(float _bias, float _tol, uint32_t _iters) : m_bias(_bias), m_tol(_tol), m_iters(_iters) {}
     void solve(const std::vector<std::unique_ptr<ConstraintBase>> &constraints, float deltaTime);
 
 private:

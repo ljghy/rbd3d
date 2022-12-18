@@ -33,56 +33,6 @@ private:
 };
 
 template <>
-inline void RigidbodyRenderer::create(rbd3d::Plane &plane)
-{
-    m_collider = &plane;
-
-    const glm::vec3 &n = plane.normal();
-    const glm::vec3 &o = plane.origin();
-    glm::vec3 absn = glm::abs(n), t;
-    if (absn.x >= absn.y && absn.x >= absn.z)
-    {
-        t = glm::normalize(glm::vec3(-n.y / n.x, 1.f, 0.f));
-    }
-    else if (absn.y > absn.x && absn.y >= absn.z)
-    {
-        t = glm::normalize(glm::vec3(0.f, -n.z / n.y, 1.f));
-    }
-    else
-    {
-        t = glm::normalize(glm::vec3(1.f, 0.f, -n.x / n.z));
-    }
-    glm::vec3 bt = glm::cross(n, t);
-
-    constexpr float l = 50.f;
-
-    glm::vec3 v[]{
-        o + t * l + bt * l,
-        o - t * l + bt * l,
-        o - t * l - bt * l,
-        o + t * l - bt * l};
-    float vertices[24]{
-        v[0].x, v[0].y, v[0].z, n.x, n.y, n.z,
-        v[1].x, v[1].y, v[1].z, n.x, n.y, n.z,
-        v[2].x, v[2].y, v[2].z, n.x, n.y, n.z,
-        v[3].x, v[3].y, v[3].z, n.x, n.y, n.z};
-
-    unsigned int indices[]{0, 1, 2,
-                           0, 2, 3};
-
-    m_VBO.create(vertices, sizeof(vertices));
-    m_IBO.create(indices, sizeof(indices));
-
-    VertexBufferLayout layout;
-    layout.push(GL_FLOAT, 3);
-    layout.push(GL_FLOAT, 3);
-
-    m_VAO.create();
-    m_VAO.bind();
-    m_VAO.addBuffer(m_VBO, layout);
-}
-
-template <>
 inline void RigidbodyRenderer::create(rbd3d::Cuboid &cube)
 {
     m_collider = &cube;

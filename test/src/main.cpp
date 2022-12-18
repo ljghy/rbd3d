@@ -118,7 +118,6 @@ int main()
         ImVec4 clear_color = ImVec4(0.2f, 0.6f, 1.0f, 0.5f);
 
         TestManager::registTest<TestCollisionDetection>("Collision Detection");
-        TestManager::registTest<TestCollisionWithGround>("Collision With Ground");
         TestManager::registTest<TestPyramid>("Pyramid");
 
         // Main loop

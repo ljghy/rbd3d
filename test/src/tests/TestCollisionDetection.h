@@ -21,15 +21,12 @@ private:
     rbd3d::Cuboid m_cube;
     rbd3d::Sphere m_sphere;
     rbd3d::Cuboid m_cube2;
-    rbd3d::Plane m_ground;
 
-    // rbd3d::CollisionInfo m_collisionInfo;
     rbd3d::ContactManifold m_cm;
 
     RigidbodyRenderer m_cubeRenderer;
     RigidbodyRenderer m_cubeRenderer2;
     RigidbodyRenderer m_sphereRenderer;
-    RigidbodyRenderer m_groundRenderer;
 
     Shader m_pointShader;
 

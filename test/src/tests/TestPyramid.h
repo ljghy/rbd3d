@@ -19,11 +19,11 @@ public:
 private:
     rbd3d::DynamicWorld m_world;
 
-    static constexpr uint32_t layers = 10;
+    static constexpr uint32_t layers = 16;
 
     rbd3d::Cuboid m_cube[(layers + 1) * layers / 2];
-    rbd3d::Plane m_ground;
-    rbd3d::Plane m_wall;
+    rbd3d::Cuboid m_ground;
+    rbd3d::Cuboid m_wall;
     rbd3d::Sphere m_sphere;
 
     RigidbodyRenderer m_cubeRenderer[(layers + 1) * layers / 2];

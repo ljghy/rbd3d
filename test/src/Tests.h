@@ -2,7 +2,6 @@
 #define TEST_VIEWER_TESTS_H_
 
 #include "tests/TestCollisionDetection.h"
-#include "tests/TestCollisionWithGround.h"
 #include "tests/TestPyramid.h"
 
 

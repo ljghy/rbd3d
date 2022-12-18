@@ -2,19 +2,21 @@
 #include <imgui.h>
 
 TestPyramid::TestPyramid()
-    : m_ground(glm::vec3(0.f, 1.f, 0.f)),
-      m_wall(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -4.f)),
-      m_sphere(0.5f, 5.f)
+    : m_ground(glm::vec3(100.f, 0.5f, 100.f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, -0.25f, 0.f)),
+      m_wall(glm::vec3(100.f, 50.f, 0.5f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, 25.f, -5.f)),
+      m_sphere(0.5f, 10.f)
 {
+    m_wall.setType(rbd3d::RigidbodyType::STATIC);
+    m_ground.setType(rbd3d::RigidbodyType::STATIC);
     for (int i = 0; i < layers; ++i)
         for (int j = 0; j <= i; ++j)
         {
             int k = (i + 1) * i / 2 + j;
-            m_cube[k].setSize(glm::vec3(0.9f, 0.5f, 0.5f));
+            m_cube[k].setSize(glm::vec3(0.9f, 0.5f, 0.7f));
             m_cube[k].setTranslation(glm::vec3(-0.5f * i + j, 0.5f * (layers - i) - 0.25f, 0.f));
             m_cubeRenderer[k].create(m_cube[k]);
         }
-    m_sphere.setTranslation(glm::vec3(0.f, 3.f, 5.f));
+    m_sphere.setTranslation(glm::vec3(0.f, 5.f, 5.f));
     m_sphere.setVelocity(glm::vec3(0.f, 0.f, -10.f));
 
     m_groundRenderer.create(m_ground);
@@ -33,7 +35,7 @@ TestPyramid::TestPyramid()
 
 void TestPyramid::onUpdate(float deltaTime)
 {
-    m_updateDur = m_world.fixedUpdate(deltaTime, 0.02f);
+    m_updateDur = m_world.fixedUpdate(deltaTime, 1.f / 60.f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))

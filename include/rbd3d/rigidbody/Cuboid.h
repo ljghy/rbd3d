@@ -19,7 +19,7 @@ public:
     virtual glm::vec3 support(const glm::vec3 &dir) const override;
     glm::vec3 support(const glm::vec3 &dir, glm::vec3 &sgn) const;
 
-    virtual RigidbodyType type() const override { return RigidbodyType::CUBOID; }
+    virtual RigidbodyShape shape() const override { return RigidbodyShape::CUBOID; }
 
     glm::vec3 size() const;
     void setSize(const glm::vec3 &);

@@ -3,7 +3,7 @@
 
 #include <rbd3d/collision.h>
 #include <rbd3d/constraint.h>
-#include <rbd3d/dynamics/SequencialImpulseSolver.h>
+#include <rbd3d/dynamics/SequentialImpulseSolver.h>
 
 #include <vector>
 #include <memory>
@@ -16,7 +16,7 @@ public:
     DynamicWorld(const glm::vec3 &_gravity = glm::vec3(0.f, -9.8f, 0.f),
                  float solverBias = 0.1f,
                  float solverTol = 1e-5f,
-                 uint32_t solverIters = 32u);
+                 uint32_t solverIters = 64u);
 
     float update(float deltaTime);
     float fixedUpdate(float deltaTime, float fixedDeltaTime);
@@ -45,7 +45,7 @@ private:
 
     std::vector<std::unique_ptr<ConstraintBase>> m_constraints;
 
-    SequencialImpulseSolver m_solver;
+    SequentialImpulseSolver m_solver;
 
     float m_accumulator;
 };

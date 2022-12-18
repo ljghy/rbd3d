@@ -4,17 +4,12 @@
 TestCollisionDetection::TestCollisionDetection()
     : m_cube(glm::vec3(0.75f)),
       m_cube2(glm::vec3(1.f, 0.8f, 0.5f)),
-      m_sphere(1.f),
-      m_ground(glm::vec3(0.f, 1.f, 0.f))
-//   m_sphere(0.5f)
+      m_sphere(1.f)
 {
-    // m_sphere.setTranslation(glm::vec3(2.f, 0.f, 0.f));
     m_cubeRenderer.create(m_cube);
     m_cube2.setTranslation(glm::vec3(2.f, 0.f, 0.f));
     m_cubeRenderer2.create(m_cube2);
     m_sphereRenderer.create(m_sphere);
-    m_groundRenderer.create(m_ground);
-    // m_sphereRenderer.create(m_sphere);
 
     const char *vertSrc = {
         "#version 330 core\n"
@@ -58,7 +53,7 @@ TestCollisionDetection::TestCollisionDetection()
 
 void TestCollisionDetection::onUpdate(float deltaTime)
 {
-    m_cm = rbd3d::collision(m_cube, m_ground);
+    m_cm = rbd3d::collision(m_cube, m_cube2);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))
@@ -98,9 +93,6 @@ void TestCollisionDetection::onRender(int viewportWidth, int viewportHeight)
     m_cubeRenderer.render(viewportWidth, viewportHeight, m_camera, color);
     m_cubeRenderer2.render(viewportWidth, viewportHeight, m_camera, color);
     m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, color);
-    m_groundRenderer.render(viewportWidth, viewportHeight, m_camera, color);
-
-    // m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, color);
 
     if (m_cm.pointCount)
     {

@@ -4,9 +4,11 @@ target_sources(rbd3d
 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/dynamics/ContactConstraint.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dynamics/FrictionConstraint.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/dynamics/SequencialImpulseSolver.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dynamics/SequentialImpulseSolver.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/dynamics/DynamicWorld.cpp
-
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/DynamicBVH.cpp
+    
     ${CMAKE_CURRENT_SOURCE_DIR}/collision/GJK.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/collision/CuboidContact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/collision/NarrowPhase.cpp
@@ -14,7 +16,6 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/RigidbodyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Sphere.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Cuboid.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Plane.cpp
 )
 
 target_include_directories(rbd3d

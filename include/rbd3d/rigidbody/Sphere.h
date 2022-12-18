@@ -17,7 +17,7 @@ public:
            const glm::vec3 &_initialAngularVelocity = glm::vec3(0.f));
     virtual glm::vec3 support(const glm::vec3 &dir) const override;
 
-    virtual RigidbodyType type() const override { return RigidbodyType::SPHERE; }
+    virtual RigidbodyShape shape() const override { return RigidbodyShape::SPHERE; }
 
     float radius() const;
     void setRadius(float);

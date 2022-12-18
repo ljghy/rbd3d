@@ -4,20 +4,28 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <rbd3d/collision/AABB.h>
+
 namespace rbd3d
 {
 
-enum class RigidbodyType
+enum class RigidbodyShape
 {
     CUBOID,
     SPHERE,
-    PLANE,
+};
+
+enum class RigidbodyType
+{
+    STATIC,
+    DYNAMIC,
+    KINEMETIC
 };
 
 class RigidbodyBase
 {
 public:
-    friend class SequencialImpulseSolver;
+    friend class SequentialImpulseSolver;
 
     RigidbodyBase(float _mass = 1.f,
                   float _restitution = 0.5f,
@@ -73,9 +81,14 @@ public:
     void addForce(const glm::vec3 &force);
     void addTorque(const glm::vec3 &torque);
 
-    virtual RigidbodyType type() const = 0;
+    virtual RigidbodyShape shape() const = 0;
 
     virtual glm::vec3 support(const glm::vec3 &dir) const = 0;
+
+    // virtual AABB tightAABB() const = 0;
+
+    RigidbodyType type() const;
+    void setType(RigidbodyType ty);
 
 protected:
     virtual void setInertia() = 0;
@@ -98,6 +111,8 @@ protected:
 
     glm::vec3 m_force;
     glm::vec3 m_torque;
+
+    RigidbodyType m_type;
 };
 } // namespace rbd3d
 

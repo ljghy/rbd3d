@@ -1,8 +1,5 @@
 #include <rbd3d/dynamics/DynamicWorld.h>
 
-#include <algorithm>
-#include <limits>
-
 #include <chrono>
 
 namespace rbd3d
@@ -89,9 +86,9 @@ void DynamicWorld::detectCollision()
         for (size_t j = 0; j < i; ++j)
         {
             auto manifold = collision(*m_rigidbodyList[i], *m_rigidbodyList[j]);
-
             for (int k = 0; k < manifold.pointCount; ++k)
             {
+
                 m_constraints.push_back(std::make_unique<ContactConstraint>(m_rigidbodyList[i], m_rigidbodyList[j],
                                                                             manifold.normal,
                                                                             manifold.contactPoints[k].depth,
@@ -121,10 +118,13 @@ void DynamicWorld::integrate(float deltaTime)
 {
     for (RigidbodyBase *r : m_rigidbodyList)
     {
-        r->setVelocity(r->velocity() + r->invMass() * r->force() * deltaTime);
-        r->setAngularVelocity(r->angularVelocity() + r->invInertia() * r->torque() * deltaTime);
-        r->translate(r->velocity() * deltaTime);
-        r->setRotation(glm::normalize(r->rotation() + glm::quat(0.f, r->angularVelocity()) * r->rotation() * deltaTime));
+        if (r->type() == RigidbodyType::DYNAMIC)
+        {
+            r->setVelocity(r->velocity() + r->invMass() * r->force() * deltaTime);
+            r->setAngularVelocity(r->angularVelocity() + r->invInertia() * r->torque() * deltaTime);
+            r->translate(r->velocity() * deltaTime);
+            r->setRotation(glm::normalize(r->rotation() + glm::quat(0.f, 0.5f * r->angularVelocity()) * r->rotation() * deltaTime));
+        }
     }
 }
 
