@@ -2,11 +2,13 @@
 
 namespace rbd3d
 {
-void SequentialImpulseSolver::solve(const std::vector<std::unique_ptr<ConstraintBase>> &constraints, float deltaTime)
+void SequentialImpulseSolver::solve(const std::vector<std::unique_ptr<Constraint>> &constraints, float deltaTime)
 {
     size_t c = constraints.size();
 
     mu.resize(c);
+    pre.resize(c);
+    float idt = 1.f / deltaTime;
     for (size_t i = 0; i < c; ++i)
     {
         const auto &ci = constraints[i];
@@ -16,10 +18,10 @@ void SequentialImpulseSolver::solve(const std::vector<std::unique_ptr<Constraint
                 glm::dot(ci->wb, ci->b->m_invInertia * ci->wb);
         mu[i] = mu[i] > 0 ? 1.f / mu[i] : 0.f;
 
+        pre[i] = {1.f + ci->restitution, m_bias * idt * ci->violation, ci->bound.x * deltaTime, ci->bound.y * deltaTime};
     }
 
     lambda.resize(c);
-    float idt = 1.f / deltaTime;
     for (uint32_t iter = 0; iter < m_iters; ++iter)
     {
         float err = 0.f;
@@ -30,15 +32,12 @@ void SequentialImpulseSolver::solve(const std::vector<std::unique_ptr<Constraint
             float last = lambda[i];
             const auto &ci = constraints[i];
 
-            float jv = 0.f;
-            if (ci->a->m_type != RigidbodyType::STATIC)
-                jv += glm::dot(ci->va, ci->a->m_velocity) +
-                      glm::dot(ci->wa, ci->a->m_angularVelocity);
-            if (ci->b->m_type != RigidbodyType::STATIC)
-                jv += glm::dot(ci->vb, ci->b->m_velocity) +
-                      glm::dot(ci->wb, ci->b->m_angularVelocity);
+            float jv = glm::dot(ci->va, ci->a->m_velocity) +
+                       glm::dot(ci->wa, ci->a->m_angularVelocity) +
+                       glm::dot(ci->vb, ci->b->m_velocity) +
+                       glm::dot(ci->wb, ci->b->m_angularVelocity);
 
-            lambda[i] = glm::clamp((1.f + ci->res) * (m_bias * idt * ci->vel - jv) * mu[i], ci->bound.x * deltaTime, ci->bound.y * deltaTime); // lambda * dt
+            lambda[i] = glm::clamp(pre[i][0] * (pre[i][1] - jv) * mu[i], pre[i][2], pre[i][3]); // lambda * dt
             if (ci->a->m_type == RigidbodyType::DYNAMIC)
             {
                 ci->a->m_velocity += ci->a->m_invMass * lambda[i] * ci->va;

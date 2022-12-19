@@ -16,8 +16,8 @@ TestPyramid::TestPyramid()
             m_cube[k].setTranslation(glm::vec3(-0.5f * i + j, 0.5f * (layers - i) - 0.25f, 0.f));
             m_cubeRenderer[k].create(m_cube[k]);
         }
-    m_sphere.setTranslation(glm::vec3(0.f, 5.f, 5.f));
-    m_sphere.setVelocity(glm::vec3(0.f, 0.f, -20.f));
+    m_sphere.setTranslation(glm::vec3(0.f, 8.f, 10.f));
+    m_sphere.setVelocity(glm::vec3(0.f, 0.f, -10.f));
 
     m_groundRenderer.create(m_ground);
     m_wallRenderer.create(m_wall);
@@ -35,7 +35,7 @@ TestPyramid::TestPyramid()
 
 void TestPyramid::onUpdate(float deltaTime)
 {
-    m_updateDur = m_world.fixedUpdate(deltaTime, 0.02f);
+    m_updateDur = m_world.fixedUpdate(deltaTime, 1.f / 60.f);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))

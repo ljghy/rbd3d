@@ -36,7 +36,7 @@ template <>
 inline void RigidbodyRenderer::create(rbd3d::Cuboid &cube)
 {
     m_collider = &cube;
-    glm::vec3 v = 0.5f * cube.size();
+    glm::vec3 v = cube.halfExtent();
 
     float vertices[]{
         v.x, v.y, v.z, 1, 0, 0,

@@ -24,6 +24,7 @@ float Sphere::radius() const
 void Sphere::setRadius(float r)
 {
     m_radius = r;
+    setInertia();
 }
 
 glm::vec3 Sphere::support(const glm::vec3 &dir) const

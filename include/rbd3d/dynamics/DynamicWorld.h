@@ -2,7 +2,7 @@
 #define RBD3D_DYNAMICS_DYNAMIC_WORLD_H_
 
 #include <rbd3d/collision.h>
-#include <rbd3d/constraint.h>
+#include <rbd3d/dynamics/Constraint.h>
 #include <rbd3d/dynamics/SequentialImpulseSolver.h>
 
 #include <rbd3d/collision/DynamicBVH.h>
@@ -17,7 +17,7 @@ class DynamicWorld
 public:
     DynamicWorld(const glm::vec3 &_gravity = glm::vec3(0.f, -9.8f, 0.f),
                  float solverBias = 0.1f,
-                 float solverTol = 1e-4f,
+                 float solverTol = 1e-3f,
                  uint32_t solverIters = 32u);
 
     float update(float deltaTime);
@@ -43,9 +43,11 @@ private:
 
     glm::vec3 m_gravity;
 
-    std::vector<std::unique_ptr<ConstraintBase>> m_constraints;
+    std::vector<std::unique_ptr<Constraint>> m_constraints;
 
     SequentialImpulseSolver m_solver;
+
+    float m_sleepVelocityThreshold;
 
     DynamicBVH m_BVH;
 

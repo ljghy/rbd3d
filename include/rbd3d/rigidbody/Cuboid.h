@@ -24,6 +24,8 @@ public:
     glm::vec3 size() const;
     void setSize(const glm::vec3 &);
 
+    glm::vec3 halfExtent() const;
+
     virtual AABB tightAABB() const override;
     virtual AABB enlargedAABB(float scale) const override;
 
@@ -31,7 +33,7 @@ protected:
     virtual void setInertia() override;
 
 protected:
-    glm::vec3 m_size;
+    glm::vec3 m_halfExtent;
 };
 } // namespace rbd3d
 #endif

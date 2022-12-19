@@ -22,7 +22,7 @@ private:
     rbd3d::Sphere m_sphere;
     rbd3d::Cuboid m_cube2;
 
-    rbd3d::ContactManifold m_cm;
+    rbd3d::ContactManifold m_cm1, m_cm2;
 
     RigidbodyRenderer m_cubeRenderer;
     RigidbodyRenderer m_cubeRenderer2;

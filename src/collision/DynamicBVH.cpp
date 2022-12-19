@@ -1,6 +1,7 @@
 #include <rbd3d/collision/DynamicBVH.h>
 
 #include <queue>
+#include <stack>
 
 #include <cassert>
 
@@ -126,7 +127,7 @@ void DynamicBVH::insertLeafAt(int leafIndex, int newParent, const AABB &aabb, Ri
 
 void DynamicBVH::insertLeaf(const AABB &aabb, RigidbodyBase *rigidbody)
 {
-    int leafIndex = m_nodes.size();
+    int leafIndex = static_cast<int>(m_nodes.size());
     m_nodes.emplace_back(aabb, rigidbody);
     if (m_nodes.size() == 1)
     {
@@ -166,7 +167,7 @@ void DynamicBVH::insertLeaf(const AABB &aabb, RigidbodyBase *rigidbody)
     }
 
     int oldParent = m_nodes[sibling].parent;
-    int newParent = m_nodes.size();
+    int newParent = static_cast<int>(m_nodes.size());
     m_nodes.emplace_back(AABB::merge(aabb, m_nodes[sibling].aabb), nullptr, oldParent);
 
     if (oldParent != nullIndex)
@@ -193,27 +194,33 @@ void DynamicBVH::update()
     for (int i = 0; i < m_nodes.size(); ++i)
         if (m_nodes[i].rigidbody != nullptr && !(m_nodes[i].rigidbody->tightAABB() <= m_nodes[i].aabb))
         {
-            removeAndInsert(i, m_nodes[i].rigidbody->enlargedAABB(1.2f));
+            removeAndInsert(i, m_nodes[i].rigidbody->enlargedAABB(enlargedAABBScale));
         }
 }
 
 void DynamicBVH::detectCollision(RigidbodyBase *rigidbody, std::vector<RigidbodyBase *> &collisions)
 {
-    detectCollision(rigidbody, rigidbody->tightAABB(), collisions, m_rootIndex);
-}
+    AABB aabb = rigidbody->tightAABB();
 
-void DynamicBVH::detectCollision(RigidbodyBase *rigidbody, const AABB &aabb, std::vector<RigidbodyBase *> &collisions, int index)
-{
-    if (index == nullIndex || (m_nodes[index].child1 == nullIndex && rigidbody <= m_nodes[index].rigidbody))
-        return;
-    if (AABB::intersect(aabb, m_nodes[index].aabb))
+    std::stack<int> s;
+    s.push(m_rootIndex);
+
+    while (!s.empty())
     {
-        if (m_nodes[index].child1 == nullIndex)
-            collisions.push_back(m_nodes[index].rigidbody);
-        else
+        int index = s.top();
+        s.pop();
+        if (m_nodes[index].child1 == nullIndex && rigidbody <= m_nodes[index].rigidbody)
+            continue;
+
+        if (AABB::intersect(aabb, m_nodes[index].aabb))
         {
-            detectCollision(rigidbody, aabb, collisions, m_nodes[index].child1);
-            detectCollision(rigidbody, aabb, collisions, m_nodes[index].child2);
+            if (m_nodes[index].child1 == nullIndex)
+                collisions.push_back(m_nodes[index].rigidbody);
+            else
+            {
+                s.push(m_nodes[index].child1);
+                s.push(m_nodes[index].child2);
+            }
         }
     }
 }

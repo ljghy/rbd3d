@@ -11,7 +11,8 @@ Cuboid::Cuboid(const glm::vec3 &_size,
                const glm::quat &_rotationOffset,
                const glm::vec3 &_initialVelocity,
                const glm::vec3 &_initialAngularVelocity)
-    : RigidbodyBase(_mass, _restitution, _friction, _translationOffset, _rotationOffset, _initialVelocity, _initialAngularVelocity), m_size(_size)
+    : RigidbodyBase(_mass, _restitution, _friction, _translationOffset, _rotationOffset, _initialVelocity, _initialAngularVelocity),
+      m_halfExtent(0.5f * _size)
 {
     setInertia();
 }
@@ -19,53 +20,41 @@ Cuboid::Cuboid(const glm::vec3 &_size,
 glm::vec3 Cuboid::support(const glm::vec3 &dir) const
 {
     glm::vec3 localDir = glm::conjugate(m_rotation) * dir;
-    glm::vec3 s(0.f);
-    if (localDir.x > 0)
-        s.x = m_size.x;
-    if (localDir.y > 0)
-        s.y = m_size.y;
-    if (localDir.z > 0)
-        s.z = m_size.z;
-    s -= 0.5f * m_size;
-
+    glm::vec3 s = glm::sign(localDir) * m_halfExtent;
     s = m_translation + m_rotation * s;
-
     return s;
 }
 
 glm::vec3 Cuboid::support(const glm::vec3 &dir, glm::vec3 &sgn) const
 {
     glm::vec3 localDir = glm::conjugate(m_rotation) * dir;
-    glm::vec3 s(0.f);
-    sgn = glm::vec3(-1.f, -1.f, -1.f);
-    for (int i = 0; i < 3; ++i)
-        if (localDir[i] > 0)
-        {
-            sgn[i] = 1;
-            s[i] = m_size[i];
-        }
-    s -= 0.5f * m_size;
-
+    sgn = glm::sign(localDir);
+    glm::vec3 s = sgn * m_halfExtent;
     s = m_translation + m_rotation * s;
-
     return s;
 }
 
 glm::vec3 Cuboid::size() const
 {
-    return m_size;
+    return 2.f * m_halfExtent;
 }
 
 void Cuboid::setSize(const glm::vec3 &s)
 {
-    m_size = s;
+    m_halfExtent = 0.5f * s;
+    setInertia();
+}
+
+glm::vec3 Cuboid::halfExtent() const
+{
+    return m_halfExtent;
 }
 
 void Cuboid::setInertia()
 {
-    glm::vec3 diag = glm::vec3(glm::dot(m_size, m_size)) - m_size * m_size;
-    m_inertia = glm::mat3(m_mass / 12.f);
-    m_invInertia = glm::mat3(m_invMass * 12.f);
+    glm::vec3 diag = glm::vec3(glm::dot(m_halfExtent, m_halfExtent)) - m_halfExtent * m_halfExtent;
+    m_inertia = glm::mat3(m_mass / 3.f);
+    m_invInertia = glm::mat3(m_invMass * 3.f);
 
     for (uint8_t i = 0; i < 3; ++i)
     {
@@ -76,25 +65,25 @@ void Cuboid::setInertia()
 
 AABB Cuboid::tightAABB() const
 {
-    glm::vec3 r(0.f), h(0.5f * m_size);
+    glm::vec3 r(0.f);
     glm::vec3 sgn[]{{1.f, 1.f, 1.f},
                     {1.f, 1.f, -1.f},
                     {1.f, -1.f, -1.f},
                     {1.f, -1.f, 1.f}};
     for (const auto &s : sgn)
-        r = glm::max(glm::abs(m_rotation * (s * h)), r);
+        r = glm::max(glm::abs(m_rotation * (s * m_halfExtent)), r);
     return {m_translation - r, m_translation + r};
 }
 
 AABB Cuboid::enlargedAABB(float scale) const
 {
-    glm::vec3 r(0.f), h(0.5f * m_size);
+    glm::vec3 r(0.f);
     glm::vec3 sgn[]{{1.f, 1.f, 1.f},
                     {1.f, 1.f, -1.f},
                     {1.f, -1.f, -1.f},
                     {1.f, -1.f, 1.f}};
     for (const auto &s : sgn)
-        r = glm::max(glm::abs(m_rotation * (s * h)), r);
+        r = glm::max(glm::abs(m_rotation * (s * m_halfExtent)), r);
     r *= scale;
     return {m_translation - r, m_translation + r};
 }

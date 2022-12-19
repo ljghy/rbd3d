@@ -54,26 +54,26 @@ ContactManifold collision(const Sphere &a, const Cuboid &b)
     ret.pointCount = 1;
 
     glm::vec3 center = glm::conjugate(b.rotation()) * (a.translation() - b.translation());
-    const glm::vec3 &halfSize = 0.5f * b.size();
+    const glm::vec3 h = b.halfExtent();
     glm::vec3 absCenter = glm::abs(center);
 
-    int cond = (absCenter.x < halfSize.x) + (absCenter.y < halfSize.y) + (absCenter.z < halfSize.z);
+    int cond = (absCenter.x < h.x) + (absCenter.y < h.y) + (absCenter.z < h.z);
     auto &cp = ret.contactPoints[0];
     if (cond == 3) // deep penetration
     {
         ret.normal = glm::vec3(0.f);
-        glm::vec3 dp = halfSize - center, dn = halfSize + center;
+        glm::vec3 dp = h - center, dn = h + center;
         int ip = argmin(dp), in = argmin(dn);
 
         if (dp[ip] < dn[in])
         {
-            center[ip] = halfSize[ip];
+            center[ip] = h[ip];
             ret.normal[ip] = -1.f;
             cp.depth = dp[ip];
         }
         else
         {
-            center[in] = -halfSize[in];
+            center[in] = -h[in];
             ret.normal[in] = 1.f;
             cp.depth = dn[in];
         }
@@ -84,20 +84,20 @@ ContactManifold collision(const Sphere &a, const Cuboid &b)
     }
     else if (cond == 2) // face
     {
-        int i = argmin(halfSize - absCenter);
+        int i = argmin(h - absCenter);
 
         ret.normal = glm::vec3(0.f);
         ret.normal[i] = -glm::sign(center[i]);
-        center[i] = glm::sign(center[i]) * halfSize[i];
+        center[i] = glm::sign(center[i]) * h[i];
         cp.position = b.rotation() * center + b.translation();
-        cp.depth = a.radius() - (absCenter[i] - halfSize[i]);
+        cp.depth = a.radius() - (absCenter[i] - h[i]);
         ret.normal = b.rotation() * ret.normal;
     }
     else if (cond == 1) // edge
     {
-        int i = argmin(absCenter - halfSize);
+        int i = argmin(absCenter - h);
 
-        cp.position = glm::sign(center) * halfSize;
+        cp.position = glm::sign(center) * h;
         cp.position[i] = center[i];
         glm::vec3 n = cp.position - center;
         float len = glm::length(n);
@@ -108,7 +108,7 @@ ContactManifold collision(const Sphere &a, const Cuboid &b)
     }
     else if (cond == 0) // vertex
     {
-        glm::vec3 p = b.rotation() * (glm::sign(center) * halfSize) + b.translation();
+        glm::vec3 p = b.rotation() * (glm::sign(center) * h) + b.translation();
         glm::vec3 n = p - a.translation();
         float len = glm::length(n);
         ret.normal = len > 0.f ? n / len : glm::normalize(b.translation() - p);
@@ -116,6 +116,40 @@ ContactManifold collision(const Sphere &a, const Cuboid &b)
     }
 
     return ret;
+}
+
+ContactManifold collision(const Sphere &a, const Capsule &b)
+{
+    ContactManifold ret;
+
+    glm::vec3 center = glm::conjugate(b.rotation()) * (a.translation() - b.translation());
+    float y0 = glm::abs(center.y) > b.halfHeight() ? glm::sign(center.y) * b.halfHeight() : center.y;
+    glm::vec3 norm(-center.x, y0 - center.y, -center.z);
+    float dis = glm::length(norm),
+          depth = a.radius() + b.radius() - dis;
+    if (depth <= 0.f)
+        return ret;
+
+    ret.pointCount = 1;
+    norm = dis > std::numeric_limits<float>::min() ? norm / dis : glm::vec3(1.f, 0.f, 0.f);
+    ret.normal = b.rotation() * norm;
+    float dr = a.radius() - b.radius();
+    center.y += y0;
+    ret.contactPoints[0].position = b.rotation() * (0.5f * (dr * norm + center)) +
+                                    b.translation();
+    ret.contactPoints[0].depth = depth;
+
+    return ret;
+}
+
+ContactManifold collision(const Capsule &a, const Capsule &b)
+{
+    glm::vec3 ra = a.halfHeight() * a.orientation(),
+              rb = b.halfHeight() * b.orientation(),
+              delta = rb - ra + a.translation() - b.translation();
+
+    ra *= 2.f;
+    rb *= 2.f;
 }
 
 } // namespace rbd3d

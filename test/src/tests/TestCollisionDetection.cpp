@@ -8,6 +8,7 @@ TestCollisionDetection::TestCollisionDetection()
 {
     m_cubeRenderer.create(m_cube);
     m_cube2.setTranslation(glm::vec3(2.f, 0.f, 0.f));
+    m_sphere.setTranslation(glm::vec3(0.f, 2.f, 0.f));
     m_cubeRenderer2.create(m_cube2);
     m_sphereRenderer.create(m_sphere);
 
@@ -53,7 +54,8 @@ TestCollisionDetection::TestCollisionDetection()
 
 void TestCollisionDetection::onUpdate(float deltaTime)
 {
-    m_cm = rbd3d::collision(m_cube, m_cube2);
+    m_cm1 = rbd3d::collision(m_cube, m_cube2);
+    m_cm2 = rbd3d::collision(m_cube, m_sphere);
 
     const float vel = 5.f;
     if (ImGui::IsKeyDown(ImGuiKey_W))
@@ -83,25 +85,27 @@ void TestCollisionDetection::onRender(int viewportWidth, int viewportHeight)
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glViewport(0, 0, viewportWidth, viewportHeight);
     glClearColor(0.9f, 0.9f, 0.9f, 1.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::vec3 color = m_cm.pointCount ? glm::vec3(1.0f, 0.6f, 0.2f) : glm::vec3(0.2f, 0.6f, 1.0f);
-    m_cubeRenderer.render(viewportWidth, viewportHeight, m_camera, color);
-    m_cubeRenderer2.render(viewportWidth, viewportHeight, m_camera, color);
-    m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, color);
+    glm::vec3 color1 = m_cm1.pointCount ? glm::vec3(1.0f, 0.6f, 0.2f) : glm::vec3(0.2f, 0.6f, 1.0f);
+    glm::vec3 color2 = m_cm2.pointCount ? glm::vec3(1.0f, 0.6f, 0.2f) : glm::vec3(0.2f, 0.6f, 1.0f);
 
-    if (m_cm.pointCount)
+    m_cubeRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.6f, 1.0f));
+    m_cubeRenderer2.render(viewportWidth, viewportHeight, m_camera, color1);
+    m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, color2);
+
+    if (m_cm1.pointCount)
     {
         m_VBO.bind();
-        std::vector<float> data(3 * m_cm.pointCount);
-        for (int i = 0; i < m_cm.pointCount; ++i)
+        std::vector<float> data(3 * m_cm1.pointCount);
+        for (int i = 0; i < m_cm1.pointCount; ++i)
             for (int j = 0; j < 3; ++j)
-                data[3 * i + j] = m_cm.contactPoints[i].position[j];
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * m_cm.pointCount * 3, data.data());
+                data[3 * i + j] = m_cm1.contactPoints[i].position[j];
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * m_cm1.pointCount * 3, data.data());
         m_VAO.bind();
         m_pointShader.use();
         glm::mat4 view = m_camera.getViewMatrix();
@@ -110,7 +114,7 @@ void TestCollisionDetection::onRender(int viewportWidth, int viewportHeight)
         m_pointShader.setUniformMatrix4fv("u_MVP", &mvp[0][0]);
 
         glEnable(GL_PROGRAM_POINT_SIZE);
-        glDrawArrays(GL_POINTS, 0, m_cm.pointCount);
+        glDrawArrays(GL_POINTS, 0, m_cm1.pointCount);
     }
 }
 
@@ -123,14 +127,14 @@ void TestCollisionDetection::onImGuiRender()
     m_cube.setTranslation(cubePos);
     m_cube.setRotation(glm::quat(glm::radians(cubeRot)));
 
-    if (m_cm.pointCount)
+    if (m_cm1.pointCount)
     {
-        auto &n = m_cm.normal;
+        auto &n = m_cm1.normal;
 
         ImGui::Text("Normal: (%.4f, %.4f, %.4f)", n.x, n.y, n.z);
-        for (int i = 0; i < m_cm.pointCount; ++i)
+        for (int i = 0; i < m_cm1.pointCount; ++i)
         {
-            auto &cp = m_cm.contactPoints[i];
+            auto &cp = m_cm1.contactPoints[i];
             ImGui::Text("Pos: (%.4f, %.4f, %.4f), Depth: %.4f", cp.position.x, cp.position.y, cp.position.z, cp.depth);
         }
     }

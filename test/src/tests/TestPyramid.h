@@ -19,7 +19,7 @@ public:
 private:
     rbd3d::DynamicWorld m_world;
 
-    static constexpr uint32_t layers = 24;
+    static constexpr uint32_t layers = 15;
 
     rbd3d::Cuboid m_cube[(layers + 1) * layers / 2];
     rbd3d::Cuboid m_ground;

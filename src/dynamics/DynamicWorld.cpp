@@ -12,7 +12,6 @@ DynamicWorld::DynamicWorld(const glm::vec3 &_gravity,
     : m_gravity(_gravity),
       m_solver(solverBias, solverTol, solverIters),
       m_accumulator(0.f)
-
 {
 }
 
@@ -40,12 +39,13 @@ float DynamicWorld::update(float deltaTime)
     clearForce();
     applyExtForce();
 
+    integrate(deltaTime);
+
     m_constraints.clear();
     detectCollision();
 
     solveConstraints(deltaTime);
 
-    integrate(deltaTime);
 
     updateBVH();
 
@@ -96,10 +96,10 @@ void DynamicWorld::detectCollision()
             auto manifold = collision(*rigidbodyA, *rigidbodyB);
             for (int k = 0; k < manifold.pointCount; ++k)
             {
-                m_constraints.push_back(std::make_unique<ContactConstraint>(rigidbodyA, rigidbodyB,
-                                                                            manifold.normal,
-                                                                            manifold.contactPoints[k].depth,
-                                                                            manifold.contactPoints[k].position));
+                m_constraints.push_back(std::make_unique<Constraint>(rigidbodyA, rigidbodyB,
+                                                                     manifold.normal,
+                                                                     manifold.contactPoints[k].depth,
+                                                                     manifold.contactPoints[k].position));
 
                 if (rigidbodyA->friction() * rigidbodyB->friction() > 0.f)
                 {
@@ -111,10 +111,10 @@ void DynamicWorld::detectCollision()
 
                     t1 = glm::normalize(t1);
                     t2 = glm::cross(manifold.normal, t1);
-                    m_constraints.push_back(std::make_unique<FrictionConstraint>(rigidbodyA, rigidbodyB,
-                                                                                 manifold.contactPoints[k].position, t1));
-                    m_constraints.push_back(std::make_unique<FrictionConstraint>(rigidbodyA, rigidbodyB,
-                                                                                 manifold.contactPoints[k].position, t2));
+                    m_constraints.push_back(std::make_unique<Constraint>(rigidbodyA, rigidbodyB,
+                                                                         manifold.contactPoints[k].position, t1));
+                    m_constraints.push_back(std::make_unique<Constraint>(rigidbodyA, rigidbodyB,
+                                                                         manifold.contactPoints[k].position, t2));
                 }
             }
         }
@@ -146,7 +146,7 @@ void DynamicWorld::addRigidbody(RigidbodyBase &rigidbody)
     }
     else
     {
-        m_BVH.insertLeaf(rigidbody.enlargedAABB(1.2f), &rigidbody);
+        m_BVH.insertLeaf(rigidbody.enlargedAABB(enlargedAABBScale), &rigidbody);
     }
 }
 

@@ -5,7 +5,7 @@
 
 namespace rbd3d
 {
-struct ConstraintBase
+struct Constraint
 {
     RigidbodyBase *a;
     RigidbodyBase *b;
@@ -15,12 +15,14 @@ struct ConstraintBase
     glm::vec3 vb;
     glm::vec3 wb;
     glm::vec2 bound;
-    float vel;
-    float res;
+    float violation;
+    float restitution;
 
-    ConstraintBase(RigidbodyBase *_a, RigidbodyBase *_b) : a(_a), b(_b) {}
+    Constraint(RigidbodyBase *a, RigidbodyBase *b,
+               const glm::vec3 &normal, float depth, const glm::vec3 &position);
 
-    virtual ~ConstraintBase() = default;
+    Constraint(RigidbodyBase *a, RigidbodyBase *b,
+               const glm::vec3 &position, const glm::vec3 &tangent);
 };
 } // namespace rbd3d
 

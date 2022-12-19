@@ -4,5 +4,6 @@
 #include <rbd3d/rigidbody/RigidbodyBase.h>
 #include <rbd3d/rigidbody/Cuboid.h>
 #include <rbd3d/rigidbody/Sphere.h>
+#include <rbd3d/rigidbody/Capsule.h>
 
 #endif

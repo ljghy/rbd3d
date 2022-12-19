@@ -18,7 +18,6 @@ QueryResult testFace(const Cuboid &c1, const Cuboid &c2,
 {
     float proj1, mid, proj2;
     QueryResult ret{-1, 0, std::numeric_limits<float>::max()};
-    glm::vec3 halfSize1 = 0.5f * c1.size(), halfSize2 = 0.5f * c2.size();
     for (int i = 0; i < 3; ++i)
     {
         axes[i] = c1.rotation() * axes[i];
@@ -28,11 +27,11 @@ QueryResult testFace(const Cuboid &c1, const Cuboid &c2,
         mid = glm::dot(c2.translation() - c1.translation(), axes[i]);
         proj2 = 2.f * mid - proj1;
 
-        float depth1 = halfSize1[i] - glm::min(proj1, proj2), depth2 = halfSize1[i] + glm::max(proj1, proj2);
+        float depth1 = c1.halfExtent()[i] - glm::min(proj1, proj2), depth2 = c1.halfExtent()[i] + glm::max(proj1, proj2);
         if (depth1 <= 0 || depth2 <= 0)
         {
             ret.i = -1;
-            return ret;
+            break;
         }
         if (depth1 < ret.depth && depth1 < depth2)
         {
@@ -65,32 +64,29 @@ QueryResult testEdge(const Cuboid &c1, const Cuboid &c2,
                 continue;
             axis = glm::normalize(axis);
 
-            glm::vec3 sgn1, sgn1n, sgn2, sgn2n;
+            glm::vec3 sgn1, sgn2;
             glm::vec3 sup1 = c1.support(axis, sgn1),
-                      sup1n = c1.support(-axis, sgn1n),
-                      sup2 = c2.support(axis, sgn2),
-                      sup2n = c2.support(-axis, sgn2n);
+                      sup2 = c2.support(axis, sgn2);
 
-            float p1 = glm::dot(sup1 - c1.translation(), axis),
-                  q1 = glm::dot(sup1n - c1.translation(), axis),
+            float p1 = glm::abs(glm::dot(sup1 - c1.translation(), axis)),
                   p2 = glm::dot(sup2 - c1.translation(), axis),
-                  q2 = glm::dot(sup2n - c1.translation(), axis);
+                  m2 = glm::dot(c2.translation() - c1.translation(), axis),
+                  q2 = 2.f * m2 - p2;
 
-            float d1 = glm::max(p2, q2) - glm::min(p1, q1),
-                  d2 = glm::max(p1, q1) - glm::min(p2, q2);
+            float d1 = p1 + glm::max(p2, q2),
+                  d2 = p1 - glm::min(p2, q2);
 
             if (d1 <= 0 || d2 <= 0)
             {
                 ret.i = -1;
-                return ret;
+                break;
             }
-
             if (d1 < d2 && d1 < ret.depth) // -axis
             {
                 ret.i = i;
                 ret.j = j;
                 ret.depth = d1;
-                ret.sgn1 = sgn1n;
+                ret.sgn1 = -sgn1;
                 ret.sgn2 = sgn2;
             }
             else if (d2 < ret.depth) // +axis
@@ -99,7 +95,7 @@ QueryResult testEdge(const Cuboid &c1, const Cuboid &c2,
                 ret.j = j;
                 ret.depth = d2;
                 ret.sgn1 = sgn1;
-                ret.sgn2 = sgn2n;
+                ret.sgn2 = -sgn2;
             }
         }
     return ret;
@@ -247,12 +243,14 @@ ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
     int j = ndot.x > ndot.y && ndot.x > ndot.z ? 0 : (ndot.y > ndot.z ? 1 : 2); // incident face index
     int j1 = (j + 1) % 3, j2 = (j + 2) % 3;
 
+    glm::vec3 h1 = c1.halfExtent(), h2 = c2.halfExtent();
+
     float k = -glm::sign(glm::dot(axes2[j], ret.normal));
     glm::quat invRot = glm::conjugate(c1.rotation());
     glm::vec3 faceNormal = axes2[j] * k;
     faceNormal = invRot * faceNormal;
     glm::vec3 faceCenter(0.f);
-    faceCenter[j] = k * 0.5f * c2.size()[j];
+    faceCenter[j] = k * h2[j];
     faceCenter = invRot * (c2.rotation() * faceCenter + c2.translation() - c1.translation());
 
     Polygon polygon{4};
@@ -260,7 +258,7 @@ ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
     float sy[]{1.f, 1.f, -1.f, -1.f};
     for (int s = 0; s < 4; ++s)
     {
-        glm::vec3 diag(0.5f * c2.size());
+        glm::vec3 diag(h2);
         diag[j] = 0;
         diag[j1] *= sx[s];
         diag[j2] *= sy[s];
@@ -269,7 +267,7 @@ ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
         polygon.vertices[s] = glm::vec2(vert[i1], vert[i2]);
     }
 
-    polygon = rectClipping(polygon, 0.5f * glm::vec2(c1.size()[i1], c1.size()[i2]));
+    polygon = rectClipping(polygon, glm::vec2(h1[i1], h1[i2]));
 
     int pointCount = 0;
     std::array<ContactPoint, 8> contactPoints;
@@ -281,10 +279,10 @@ ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
         vert[i2] = polygon.vertices[s].y;
         vert[i] = (glm::dot(faceCenter, faceNormal) - faceNormal[i1] * vert[i1] - faceNormal[i2] * vert[i2]) / faceNormal[i];
 
-        float depth = 0.5f * c1.size()[i] - faceQuery.j * vert[i];
+        float depth = h1[i] - faceQuery.j * vert[i];
         if (depth > 0)
         {
-            vert[i] = faceQuery.j * 0.5f * c1.size()[i];
+            vert[i] = faceQuery.j * h1[i];
             vert = c1.rotation() * vert + c1.translation();
             contactPoints[pointCount++] = {vert, depth};
         }
@@ -300,8 +298,8 @@ ContactManifold createEdgeContact(const Cuboid &c1, const Cuboid &c2,
                                   const std::array<glm::vec3, 3> &axes1,
                                   const std::array<glm::vec3, 3> &axes2)
 {
-    glm::vec3 origin1 = c1.rotation() * (edgeQuery.sgn1 * 0.5f * c1.size()) + c1.translation();
-    glm::vec3 origin2 = c2.rotation() * (edgeQuery.sgn2 * 0.5f * c2.size()) + c2.translation();
+    glm::vec3 origin1 = c1.rotation() * (edgeQuery.sgn1 * c1.halfExtent()) + c1.translation();
+    glm::vec3 origin2 = c2.rotation() * (edgeQuery.sgn2 * c2.halfExtent()) + c2.translation();
     const glm::vec3 &d1 = axes1[edgeQuery.i], d2 = axes2[edgeQuery.j];
 
     glm::vec3 delta = origin1 - origin2;

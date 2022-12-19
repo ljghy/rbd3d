@@ -38,7 +38,8 @@ private:
     void removeAndInsert(int index, const AABB &newAABB);
     void insertLeafAt(int leafIndex, int newParent, const AABB &aabb, RigidbodyBase *rigidbody);
     void refit(int index);
-    void detectCollision(RigidbodyBase *rigidbody, const AABB &aabb, std::vector<RigidbodyBase *> &collisions, int index);
+
+    // TODO: Tree rotation
 
 private:
     std::vector<BVHNode> m_nodes;
