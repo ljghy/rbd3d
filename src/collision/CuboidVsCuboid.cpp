@@ -1,4 +1,4 @@
-#include <rbd3d/collision/CuboidContact.h>
+#include <rbd3d/collision/CuboidVsCuboid.h>
 
 #include <array>
 
@@ -13,8 +13,8 @@ struct QueryResult
     glm::vec3 sgn2;
 };
 
-QueryResult testFace(const Cuboid &c1, const Cuboid &c2,
-                     std::array<glm::vec3, 3> &axes)
+static QueryResult testFace(const Cuboid &c1, const Cuboid &c2,
+                            std::array<glm::vec3, 3> &axes)
 {
     float proj1, mid, proj2;
     QueryResult ret{-1, 0, std::numeric_limits<float>::max()};
@@ -51,18 +51,19 @@ QueryResult testFace(const Cuboid &c1, const Cuboid &c2,
     return ret;
 }
 
-QueryResult testEdge(const Cuboid &c1, const Cuboid &c2,
-                     const std::array<glm::vec3, 3> &axes1,
-                     const std::array<glm::vec3, 3> &axes2)
+static QueryResult testEdge(const Cuboid &c1, const Cuboid &c2,
+                            const std::array<glm::vec3, 3> &axes1,
+                            const std::array<glm::vec3, 3> &axes2)
 {
     QueryResult ret{-1, 0, std::numeric_limits<float>::max()};
     for (int i = 0; i < 3; ++i)
         for (int j = 0; j < 3; ++j)
         {
             glm::vec3 axis = glm::cross(axes1[i], axes2[j]);
-            if (axis.x == 0.f && axis.y == 0.f && axis.z == 0.f)
+            float len = glm::length(axis);
+            if (len <= std::numeric_limits<float>::epsilon())
                 continue;
-            axis = glm::normalize(axis);
+            axis /= len;
 
             glm::vec3 sgn1, sgn2;
             glm::vec3 sup1 = c1.support(axis, sgn1),
@@ -109,7 +110,7 @@ struct Polygon
     void push(const glm::vec2 &vert) { vertices[count++] = vert; }
 };
 
-glm::vec2 intersection(const glm::vec2 &v1, const glm::vec2 &v2, int i, float b)
+static glm::vec2 intersection(const glm::vec2 &v1, const glm::vec2 &v2, int i, float b)
 {
     int j = (i + 1) % 2;
     float t = (b - v1[i]) / (v2[i] - v1[i]);
@@ -119,7 +120,7 @@ glm::vec2 intersection(const glm::vec2 &v1, const glm::vec2 &v2, int i, float b)
     return ret;
 }
 
-Polygon rectClipping(Polygon p, const glm::vec2 &bound)
+static Polygon rectClipping(Polygon p, const glm::vec2 &bound)
 {
     Polygon ret(p);
     int sgn[]{1, 1, -1, -1};
@@ -151,7 +152,7 @@ Polygon rectClipping(Polygon p, const glm::vec2 &bound)
     return ret;
 }
 
-void reduceContactPoint(int pointCount, const std::array<ContactPoint, 8> &contactPoints, ContactManifold &ret)
+static void reduceContactPoint(int pointCount, const std::array<ContactPoint, 8> &contactPoints, ContactManifold &ret)
 {
     if (pointCount < 5)
     {
@@ -225,10 +226,10 @@ void reduceContactPoint(int pointCount, const std::array<ContactPoint, 8> &conta
     ret.contactPoints[3] = contactPoints[i3];
 }
 
-ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
-                                  const QueryResult &faceQuery,
-                                  const std::array<glm::vec3, 3> &axes1,
-                                  const std::array<glm::vec3, 3> &axes2)
+static ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
+                                         const QueryResult &faceQuery,
+                                         const std::array<glm::vec3, 3> &axes1,
+                                         const std::array<glm::vec3, 3> &axes2)
 {
     ContactManifold ret;
 
@@ -293,10 +294,10 @@ ContactManifold createFaceContact(const Cuboid &c1, const Cuboid &c2,
     return ret;
 }
 
-ContactManifold createEdgeContact(const Cuboid &c1, const Cuboid &c2,
-                                  const QueryResult &edgeQuery,
-                                  const std::array<glm::vec3, 3> &axes1,
-                                  const std::array<glm::vec3, 3> &axes2)
+static ContactManifold createEdgeContact(const Cuboid &c1, const Cuboid &c2,
+                                         const QueryResult &edgeQuery,
+                                         const std::array<glm::vec3, 3> &axes1,
+                                         const std::array<glm::vec3, 3> &axes2)
 {
     glm::vec3 origin1 = c1.rotation() * (edgeQuery.sgn1 * c1.halfExtent()) + c1.translation();
     glm::vec3 origin2 = c2.rotation() * (edgeQuery.sgn2 * c2.halfExtent()) + c2.translation();
@@ -318,7 +319,7 @@ ContactManifold createEdgeContact(const Cuboid &c1, const Cuboid &c2,
     return ret;
 }
 
-ContactManifold cuboidContact(const Cuboid &c1, const Cuboid &c2)
+ContactManifold collision(const Cuboid &c1, const Cuboid &c2)
 {
     ContactManifold ret;
     std::array<glm::vec3, 3> axes1{glm::vec3(1.f, 0.f, 0.f),

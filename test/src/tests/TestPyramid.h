@@ -1,5 +1,5 @@
-#ifndef TEST_VIEWER_TEST_STACK_H_
-#define TEST_VIEWER_TEST_STACK_H_
+#ifndef TEST_VIEWER_TEST_PYRAMID_H_
+#define TEST_VIEWER_TEST_PYRAMID_H_
 
 #include "../TestBase.h"
 #include "../RigidbodyRenderer.h"

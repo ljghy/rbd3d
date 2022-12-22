@@ -18,15 +18,17 @@ public:
     TestCollisionDetection();
 
 private:
-    rbd3d::Cuboid m_cube;
+    rbd3d::Capsule m_cube;
     rbd3d::Sphere m_sphere;
     rbd3d::Cuboid m_cube2;
+    rbd3d::Capsule m_capsule;
 
     rbd3d::ContactManifold m_cm1, m_cm2;
 
     RigidbodyRenderer m_cubeRenderer;
     RigidbodyRenderer m_cubeRenderer2;
     RigidbodyRenderer m_sphereRenderer;
+    RigidbodyRenderer m_capsuleRenderer;
 
     Shader m_pointShader;
 

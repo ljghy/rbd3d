@@ -38,14 +38,12 @@ float DynamicWorld::update(float deltaTime)
 
     clearForce();
     applyExtForce();
-
     integrate(deltaTime);
 
     m_constraints.clear();
     detectCollision();
 
     solveConstraints(deltaTime);
-
 
     updateBVH();
 

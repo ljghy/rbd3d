@@ -119,6 +119,7 @@ int main()
 
         TestManager::registTest<TestCollisionDetection>("Collision Detection");
         TestManager::registTest<TestPyramid>("Pyramid");
+        TestManager::registTest<TestPile>("Pile");
 
         // Main loop
         while (!glfwWindowShouldClose(window))

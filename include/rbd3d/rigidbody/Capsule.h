@@ -21,7 +21,7 @@ public:
 
     virtual glm::vec3 support(const glm::vec3 &dir) const override;
 
-    virtual RigidbodyShape shape() const override { return RigidbodyShape::SPHERE; }
+    virtual RigidbodyShape shape() const override { return RigidbodyShape::CAPSULE; }
 
     float radius() const;
     void setRadius(float);

@@ -9,9 +9,13 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/collision/AABB.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/collision/DynamicBVH.cpp
     
-    ${CMAKE_CURRENT_SOURCE_DIR}/collision/GJK.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/collision/CuboidContact.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/collision/NarrowPhase.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/SphereVsSphere.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/SphereVsCapsule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/SphereVsCuboid.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/CapsuleVsCapsule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/CapsuleVsCuboid.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/collision/CuboidVsCuboid.cpp
 
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/RigidbodyBase.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Sphere.cpp

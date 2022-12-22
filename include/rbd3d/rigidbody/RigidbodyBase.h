@@ -12,6 +12,7 @@ namespace rbd3d
 enum class RigidbodyShape
 {
     CUBOID,
+    CAPSULE,
     SPHERE,
 };
 

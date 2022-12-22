@@ -3,6 +3,7 @@
 
 #include "tests/TestCollisionDetection.h"
 #include "tests/TestPyramid.h"
+#include "tests/TestPile.h"
 
 
 #endif

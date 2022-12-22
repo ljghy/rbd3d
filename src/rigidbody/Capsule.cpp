@@ -47,11 +47,8 @@ float Capsule::halfHeight() const
 
 glm::vec3 Capsule::support(const glm::vec3 &dir) const
 {
-    glm::vec3 localDir = glm::conjugate(m_rotation) * dir;
-    glm::vec3 s = m_radius * localDir;
-    s.y += glm::sign(localDir.y) * m_halfHeight;
-    s = m_rotation * s + m_translation;
-    return s;
+    glm::vec3 o = m_rotation * glm::vec3(0.f, m_halfHeight, 0.f);
+    return m_translation + m_radius * dir + (glm::dot(dir, o) > 0.f ? 1.f : -1.f) * o;
 }
 
 void Capsule::setInertia()
@@ -79,17 +76,24 @@ void Capsule::setInertia()
     m_invInertia[1][1] = 1.f / d1;
 }
 
+static glm::vec3 sign2(glm::vec3 v) // 1 or -1
+{
+    for (int i = 0; i < 3; ++i)
+        v[i] = v[i] > 0.f ? 1.f : -1.f;
+    return v;
+}
+
 AABB Capsule::tightAABB() const
 {
     glm::vec3 r = m_halfHeight * (m_rotation * glm::vec3(0.f, 1.f, 0.f));
-    r = glm::abs(r + glm::sign(r) * glm::vec3(m_radius));
+    r = glm::abs(r + sign2(r) * glm::vec3(m_radius));
     return {m_translation - r, m_translation + r};
 }
 
 AABB Capsule::enlargedAABB(float scale) const
 {
     glm::vec3 r = m_halfHeight * (m_rotation * glm::vec3(0.f, 1.f, 0.f));
-    r = scale * glm::abs(r + glm::sign(r) * glm::vec3(m_radius));
+    r = scale * glm::abs(r + sign2(r) * glm::vec3(m_radius));
     return {m_translation - r, m_translation + r};
 }
 

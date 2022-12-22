@@ -2,7 +2,7 @@
 #include <imgui.h>
 
 TestCollisionDetection::TestCollisionDetection()
-    : m_cube(glm::vec3(0.75f)),
+    : m_cube(0.2f, 0.5f),
       m_cube2(glm::vec3(1.f, 0.8f, 0.5f)),
       m_sphere(1.f)
 {
@@ -11,6 +11,7 @@ TestCollisionDetection::TestCollisionDetection()
     m_sphere.setTranslation(glm::vec3(0.f, 2.f, 0.f));
     m_cubeRenderer2.create(m_cube2);
     m_sphereRenderer.create(m_sphere);
+    m_capsuleRenderer.create(m_capsule);
 
     const char *vertSrc = {
         "#version 330 core\n"
@@ -54,7 +55,7 @@ TestCollisionDetection::TestCollisionDetection()
 
 void TestCollisionDetection::onUpdate(float deltaTime)
 {
-    m_cm1 = rbd3d::collision(m_cube, m_cube2);
+    m_cm1 = rbd3d::collision(m_cube, m_capsule);
     m_cm2 = rbd3d::collision(m_cube, m_sphere);
 
     const float vel = 5.f;
@@ -85,7 +86,7 @@ void TestCollisionDetection::onRender(int viewportWidth, int viewportHeight)
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glViewport(0, 0, viewportWidth, viewportHeight);
     glClearColor(0.9f, 0.9f, 0.9f, 1.f);
@@ -97,6 +98,7 @@ void TestCollisionDetection::onRender(int viewportWidth, int viewportHeight)
     m_cubeRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.6f, 1.0f));
     m_cubeRenderer2.render(viewportWidth, viewportHeight, m_camera, color1);
     m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, color2);
+    m_capsuleRenderer.render(viewportWidth, viewportHeight, m_camera, color1);
 
     if (m_cm1.pointCount)
     {
