@@ -313,7 +313,7 @@ static ContactManifold createEdgeContact(const Cuboid &c1, const Cuboid &c2,
     ret.pointCount = 1;
     ret.contactPoints[0] = {0.5f * (origin1 + origin2 + t1 * d1 + t2 * d2), edgeQuery.depth};
 
-    ret.normal = glm::cross(d1, d2) / sqrt(k);
+    ret.normal = glm::cross(d1, d2) / glm::sqrt(k);
     if (glm::dot(ret.normal, origin1 - c1.translation()) < 0.f)
         ret.normal = -ret.normal;
     return ret;

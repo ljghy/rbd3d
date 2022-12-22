@@ -47,8 +47,6 @@ private:
 
     SequentialImpulseSolver m_solver;
 
-    float m_sleepVelocityThreshold;
-
     DynamicBVH m_BVH;
 
     float m_accumulator;
