@@ -4,7 +4,6 @@
 #include <rbd3d/rigidbody/RigidbodyBase.h>
 #include <rbd3d/dynamics/Constraint.h>
 
-#include <memory>
 #include <vector>
 
 namespace rbd3d
@@ -13,7 +12,7 @@ class SequentialImpulseSolver
 {
 public:
     SequentialImpulseSolver(float _bias, float _tol, uint32_t _iters) : m_bias(_bias), m_tol(_tol), m_iters(_iters) {}
-    void solve(const std::vector<std::unique_ptr<Constraint>> &constraints, float deltaTime);
+    void solve(size_t constraintCount, const std::vector<Constraint> &constraints, float deltaTime);
 
 private:
     float m_bias;

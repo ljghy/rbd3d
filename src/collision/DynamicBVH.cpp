@@ -41,6 +41,7 @@ void DynamicBVH::refit(int index)
         int child1 = m_nodes[index].child1;
         int child2 = m_nodes[index].child2;
         m_nodes[index].aabb = AABB::merge(m_nodes[child1].aabb, m_nodes[child2].aabb);
+        rotate(index);
         index = m_nodes[index].parent;
     }
 }
@@ -222,6 +223,40 @@ void DynamicBVH::detectCollision(RigidbodyBase *rigidbody, std::vector<Rigidbody
                 s.push(m_nodes[index].child2);
             }
         }
+    }
+}
+
+void DynamicBVH::rotate(int index)
+{
+    int parent = m_nodes[index].parent;
+    if (parent == nullIndex)
+        return;
+    int grandparent = m_nodes[m_nodes[index].parent].parent;
+    if (grandparent == nullIndex)
+        return;
+    int &uncle = (parent == m_nodes[grandparent].child1) ? m_nodes[grandparent].child2 : m_nodes[grandparent].child1;
+    if (m_nodes[uncle].child1 != nullIndex)
+        return;
+    int &sibling = (index == m_nodes[parent].child1) ? m_nodes[parent].child2 : m_nodes[parent].child1;
+    float oldArea = m_nodes[parent].aabb.area();
+    AABB newAABB1 = AABB::merge(m_nodes[index].aabb, m_nodes[uncle].aabb),
+         newAABB2 = AABB::merge(m_nodes[sibling].aabb, m_nodes[uncle].aabb);
+    float newArea1 = newAABB1.area(), newArea2 = newAABB2.area();
+    if (newArea1 < oldArea && newArea1 < newArea2)
+    {
+        m_nodes[uncle].parent = parent;
+        m_nodes[sibling].parent = grandparent;
+        int val = uncle;
+        uncle = sibling;
+        sibling = val;
+    }
+    else if (newArea2 < oldArea)
+    {
+        m_nodes[uncle].parent = parent;
+        m_nodes[index].parent = grandparent;
+        int val = uncle;
+        uncle = index;
+        (index == m_nodes[parent].child1 ? m_nodes[parent].child1 : m_nodes[parent].child2) = val;
     }
 }
 

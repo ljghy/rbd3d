@@ -38,6 +38,7 @@ private:
     void removeAndInsert(int index, const AABB &newAABB);
     void insertLeafAt(int leafIndex, int newParent, const AABB &aabb, RigidbodyBase *rigidbody);
     void refit(int index);
+    void rotate(int index);
 
     // TODO: Tree rotation
 

@@ -5,10 +5,7 @@
 #include <rbd3d/dynamics/Constraint.h>
 #include <rbd3d/dynamics/SequentialImpulseSolver.h>
 
-#include <rbd3d/collision/DynamicBVH.h>
-
 #include <vector>
-#include <memory>
 
 namespace rbd3d
 {
@@ -38,12 +35,15 @@ private:
     void resetAccumulator();
     void updateBVH();
 
+    void addConstraint(const Constraint &);
+
 private:
     std::vector<RigidbodyBase *> m_rigidbodyList;
 
     glm::vec3 m_gravity;
 
-    std::vector<std::unique_ptr<Constraint>> m_constraints;
+    size_t m_constraintCount;
+    std::vector<Constraint> m_constraints;
 
     SequentialImpulseSolver m_solver;
 
