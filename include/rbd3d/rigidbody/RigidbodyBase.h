@@ -6,6 +6,8 @@
 
 #include <rbd3d/collision/AABB.h>
 
+#include <cstdint>
+
 namespace rbd3d
 {
 
@@ -92,6 +94,14 @@ public:
     RigidbodyType type() const;
     void setType(RigidbodyType ty);
 
+    uint16_t collisionGroup() const;
+    uint16_t collisionFilter() const;
+
+    void setCollisionGroup(uint16_t);
+    void setCollisionFilter(uint16_t);
+
+    bool collidableWith(uint16_t) const;
+
 protected:
     virtual void setInertia() = 0;
 
@@ -115,6 +125,9 @@ protected:
     glm::vec3 m_torque;
 
     RigidbodyType m_type;
+
+    uint16_t m_collisionGroup;
+    uint16_t m_collisionFilter;
 };
 } // namespace rbd3d
 

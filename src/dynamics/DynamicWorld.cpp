@@ -38,14 +38,14 @@ float DynamicWorld::update(float deltaTime)
 
     clearForce();
     applyExtForce();
+
     integrate(deltaTime);
+    updateBVH();
 
     m_constraintCount = 0;
     detectCollision();
-
+    checkJoints();
     solveConstraints(deltaTime);
-
-    updateBVH();
 
     auto end = std::chrono::high_resolution_clock::now();
     float dur = static_cast<std::chrono::duration<float>>(end - start).count();
@@ -84,7 +84,8 @@ void DynamicWorld::addConstraint(const Constraint &c)
     if (m_constraintCount >= m_constraints.size())
         m_constraints.push_back(c);
     else
-        m_constraints[m_constraintCount++] = c;
+        m_constraints[m_constraintCount] = c;
+    ++m_constraintCount;
 }
 
 void DynamicWorld::detectCollision()
@@ -102,10 +103,10 @@ void DynamicWorld::detectCollision()
             auto manifold = collision(*rigidbodyA, *rigidbodyB);
             for (int k = 0; k < manifold.pointCount; ++k)
             {
-                addConstraint(Constraint(rigidbodyA, rigidbodyB,
-                                         manifold.normal,
-                                         manifold.contactPoints[k].depth,
-                                         manifold.contactPoints[k].position));
+                addConstraint(Constraint::contactConstraint(rigidbodyA, rigidbodyB,
+                                                            manifold.normal,
+                                                            manifold.contactPoints[k].depth,
+                                                            manifold.contactPoints[k].position));
 
                 if (rigidbodyA->friction() * rigidbodyB->friction() > 0.f)
                 {
@@ -117,13 +118,22 @@ void DynamicWorld::detectCollision()
 
                     t1 = glm::normalize(t1);
                     t2 = glm::cross(manifold.normal, t1);
-                    addConstraint(Constraint(rigidbodyA, rigidbodyB,
-                                             manifold.contactPoints[k].position, t1));
-                    addConstraint(Constraint(rigidbodyA, rigidbodyB,
-                                             manifold.contactPoints[k].position, t2));
+                    addConstraint(Constraint::frictionConstraint(rigidbodyA, rigidbodyB,
+                                                                 manifold.contactPoints[k].position, t1));
+                    addConstraint(Constraint::frictionConstraint(rigidbodyA, rigidbodyB,
+                                                                 manifold.contactPoints[k].position, t2));
                 }
             }
         }
+    }
+}
+
+void DynamicWorld::checkJoints()
+{
+    for (const auto &j : m_jointList)
+    {
+        j->checkTranslationConstraints(m_constraintCount, m_constraints);
+        j->checkRotationConstraints(m_constraintCount, m_constraints);
     }
 }
 
@@ -143,15 +153,23 @@ void DynamicWorld::integrate(float deltaTime)
 
 void DynamicWorld::addRigidbody(RigidbodyBase &rigidbody)
 {
-    assert(std::find(m_rigidbodyList.begin(), m_rigidbodyList.end(), &rigidbody) == m_rigidbodyList.end());
     m_rigidbodyList.push_back(&rigidbody);
-
     m_BVH.insertLeaf(rigidbody.enlargedAABB(enlargedAABBScale), &rigidbody);
+}
+
+void DynamicWorld::addJoint(Joint &joint)
+{
+    m_jointList.push_back(&joint);
 }
 
 void DynamicWorld::updateBVH()
 {
     m_BVH.update();
+}
+
+void DynamicWorld::setGravity(const glm::vec3 &g)
+{
+    m_gravity = g;
 }
 
 } // namespace rbd3d

@@ -40,8 +40,6 @@ private:
     void refit(int index);
     void rotate(int index);
 
-    // TODO: Tree rotation
-
 private:
     std::vector<BVHNode> m_nodes;
     int m_rootIndex;

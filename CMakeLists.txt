@@ -4,4 +4,6 @@ project(rbd3d)
 
 add_subdirectory(src)
 
-add_subdirectory(test)
+if (RBD3D_BUILD_TESTS)
+    add_subdirectory(test)
+endif()

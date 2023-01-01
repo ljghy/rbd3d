@@ -22,7 +22,9 @@ RigidbodyBase::RigidbodyBase(float _mass,
       m_angularVelocity(_initialAngularVelocity),
       m_force(glm::vec3(0.f)),
       m_torque(glm::vec3(0.f)),
-      m_type(RigidbodyType::DYNAMIC)
+      m_type(RigidbodyType::DYNAMIC),
+      m_collisionGroup(0),
+      m_collisionFilter(0x0)
 {
 }
 
@@ -183,6 +185,31 @@ RigidbodyType RigidbodyBase::type() const
 void RigidbodyBase::setType(RigidbodyType ty)
 {
     m_type = ty;
+}
+
+uint16_t RigidbodyBase::collisionGroup() const
+{
+    return m_collisionGroup;
+}
+
+uint16_t RigidbodyBase::collisionFilter() const
+{
+    return m_collisionFilter;
+}
+
+void RigidbodyBase::setCollisionGroup(uint16_t g)
+{
+    m_collisionGroup = g;
+}
+
+void RigidbodyBase::setCollisionFilter(uint16_t f)
+{
+    m_collisionFilter = f;
+}
+
+bool RigidbodyBase::collidableWith(uint16_t g) const
+{
+    return !((1 << g) & m_collisionFilter);
 }
 
 }; // namespace rbd3d

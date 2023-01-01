@@ -18,11 +18,14 @@ struct Constraint
     float violation;
     float restitution;
 
-    Constraint(RigidbodyBase *a, RigidbodyBase *b,
-               const glm::vec3 &normal, float depth, const glm::vec3 &position);
-
-    Constraint(RigidbodyBase *a, RigidbodyBase *b,
-               const glm::vec3 &position, const glm::vec3 &tangent);
+    static Constraint contactConstraint(RigidbodyBase *a, RigidbodyBase *b,
+                                        const glm::vec3 &normal, float depth, const glm::vec3 &position);
+    static Constraint frictionConstraint(RigidbodyBase *a, RigidbodyBase *b,
+                                         const glm::vec3 &position, const glm::vec3 &tangent);
+    static Constraint jointTranslationConstraint(RigidbodyBase *a, RigidbodyBase *b,
+                                                 const glm::vec3 &normal, float depth, const glm::vec3 &position);
+    static Constraint jointRotationConstraint(RigidbodyBase *a, RigidbodyBase *b,
+                                              const glm::vec3 &axis, float theta);
 };
 } // namespace rbd3d
 

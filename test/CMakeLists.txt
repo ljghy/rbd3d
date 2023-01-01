@@ -16,6 +16,7 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/TestCollisionDetection.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/TestPyramid.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/TestPile.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/tests/TestJoint.cpp
 
 )
 

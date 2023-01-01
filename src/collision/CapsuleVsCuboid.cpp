@@ -15,8 +15,8 @@ static float testEdge(const glm::vec3 &c1, const glm::vec3 &o1,
         for (int j = 0; j < 4; ++j)
         {
             glm::vec3 sgn(0.f);
-            sgn[i1] = 2 * (j % 2) - 1;
-            sgn[i2] = 2 * (j / 2) - 1;
+            sgn[i1] = 2.f * (j % 2) - 1.f;
+            sgn[i2] = 2.f * (j / 2) - 1.f;
             glm::vec3 c2 = he * sgn,
                       o2 = glm::vec3(0.f);
             o2[i] = 1.f;
@@ -181,12 +181,14 @@ ContactManifold collision(const Capsule &a, const Cuboid &b)
         if (depth1 < depth2 && depth1 < faceQuery.depth)
         {
             faceQuery.depth = depth1;
-            faceQuery.i = i + 1;
+            faceQuery.i = i;
+            faceQuery.sgn.x = 1.f;
         }
         else if (depth2 < faceQuery.depth)
         {
             faceQuery.depth = depth2;
-            faceQuery.i = -(i + 1);
+            faceQuery.i = i;
+            faceQuery.sgn.x = -1.f;
         }
     }
 
@@ -242,8 +244,8 @@ ContactManifold collision(const Capsule &a, const Cuboid &b)
     constexpr float tol = 1e-5f;
     if (faceQuery.depth < edgeQuery.depth + tol)
     {
-        int sgn = 2 * (faceQuery.i > 0) - 1;
-        int i0 = faceQuery.i * sgn - 1;
+        float sgn = faceQuery.sgn.x;
+        int i0 = faceQuery.i;
         int i1 = (i0 + 1) % 3, i2 = (i0 + 2) % 3;
         float t1 = hh, t2 = -hh;
         for (int i : {i1, i2})

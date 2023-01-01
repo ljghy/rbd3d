@@ -14,7 +14,7 @@ cd build
 #### Windows MSVC
 
 ```
-cmake ..
+cmake -DRBD3D_BUILD_TESTS=ON ..
 cmake --build . --config Release
 .\test\Release\test_viewer.exe
 ```
@@ -22,7 +22,7 @@ cmake --build . --config Release
 #### Windows MinGW
 
 ```
-cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+cmake -G"MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DRBD3D_BUILD_TESTS=ON ..
 mingw32-make
 .\test\test_viewer.exe
 ```
@@ -30,7 +30,7 @@ mingw32-make
 #### Linux GCC
 
 ```
-cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_BUILD_TYPE=Release -DRBD3D_BUILD_TESTS=ON ..
 make 
 export MESA_GL_VERSION_OVERRIDE=3.3
 ./test/test_viewer

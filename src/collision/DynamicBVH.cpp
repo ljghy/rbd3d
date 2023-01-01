@@ -209,14 +209,20 @@ void DynamicBVH::detectCollision(RigidbodyBase *rigidbody, std::vector<Rigidbody
     while (!s.empty())
     {
         int index = s.top();
+
         s.pop();
         if (m_nodes[index].child1 == nullIndex && rigidbody <= m_nodes[index].rigidbody)
             continue;
 
         if (AABB::intersect(aabb, m_nodes[index].aabb))
         {
+
             if (m_nodes[index].child1 == nullIndex)
-                collisions.push_back(m_nodes[index].rigidbody);
+            {
+                if (rigidbody->collidableWith(m_nodes[index].rigidbody->collisionGroup()) &&
+                    m_nodes[index].rigidbody->collidableWith(rigidbody->collisionGroup()))
+                    collisions.push_back(m_nodes[index].rigidbody);
+            }
             else
             {
                 s.push(m_nodes[index].child1);
@@ -246,6 +252,7 @@ void DynamicBVH::rotate(int index)
     {
         m_nodes[uncle].parent = parent;
         m_nodes[sibling].parent = grandparent;
+
         int val = uncle;
         uncle = sibling;
         sibling = val;

@@ -21,6 +21,8 @@ PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Sphere.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Cuboid.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/rigidbody/Capsule.cpp
+    
+    ${CMAKE_CURRENT_SOURCE_DIR}/joint/Joint.cpp
 )
 
 target_include_directories(rbd3d
