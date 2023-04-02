@@ -18,12 +18,11 @@ public:
     template <typename ColliderType>
     void create(ColliderType &);
 
-    void render(int viewportWidth, int viewportHeight, Camera &camera, const glm::vec3 &color);
+    void render(Shader &shader, int viewportWidth, int viewportHeight, Camera &camera, const glm::vec3 &color);
 
 private:
     rbd3d::RigidbodyBase *m_collider;
 
-    Shader m_shader;
     VertexBufferObject m_VBO;
     VertexArrayObject m_VAO;
     IndexBufferObject m_IBO;

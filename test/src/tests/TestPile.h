@@ -15,7 +15,7 @@ public:
     virtual void onRender(int viewportWidth, int viewportHeight) override;
     virtual void onImGuiRender() override;
 
-    TestPile();
+    TestPile(Shader &);
     virtual ~TestPile() override;
 
     void addRandomRigidbody();

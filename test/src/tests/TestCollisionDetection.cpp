@@ -1,8 +1,9 @@
 #include "TestCollisionDetection.h"
 #include <imgui.h>
 
-TestCollisionDetection::TestCollisionDetection()
-    : m_cube(0.2f, 0.5f),
+TestCollisionDetection::TestCollisionDetection(Shader &shader)
+    : TestBase(shader),
+      m_cube(0.2f, 0.5f),
       m_cube2(glm::vec3(1.f, 0.8f, 0.5f)),
       m_sphere(1.f)
 {
@@ -95,10 +96,10 @@ void TestCollisionDetection::onRender(int viewportWidth, int viewportHeight)
     glm::vec3 color1 = m_cm1.pointCount ? glm::vec3(1.0f, 0.6f, 0.2f) : glm::vec3(0.2f, 0.6f, 1.0f);
     glm::vec3 color2 = m_cm2.pointCount ? glm::vec3(1.0f, 0.6f, 0.2f) : glm::vec3(0.2f, 0.6f, 1.0f);
 
-    m_cubeRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.6f, 1.0f));
-    m_cubeRenderer2.render(viewportWidth, viewportHeight, m_camera, color1);
-    m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, color2);
-    m_capsuleRenderer.render(viewportWidth, viewportHeight, m_camera, color1);
+    m_cubeRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.6f, 1.0f));
+    m_cubeRenderer2.render(m_baseShader, viewportWidth, viewportHeight, m_camera, color1);
+    m_sphereRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, color2);
+    m_capsuleRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, color1);
 
     if (m_cm1.pointCount)
     {

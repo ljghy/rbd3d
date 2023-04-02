@@ -1,7 +1,8 @@
 #include "TestJoint.h"
 #include <imgui.h>
 
-TestJoint::TestJoint()
+TestJoint::TestJoint(Shader &shader)
+    : TestBase(shader)
 {
     m_gravity = glm::vec3(0.f, -9.8f, 0.f);
     m_cube.setSize(glm::vec3(2.f, 2.f, 2.f));
@@ -94,8 +95,8 @@ void TestJoint::onRender(int viewportWidth, int viewportHeight)
 
     for (size_t i = 0; i < height; ++i)
         for (size_t j = 0; j < width; ++j)
-            m_renderers[i][j].render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.8f, 0.3f));
-    m_cubeRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.3f, 0.8f));
+            m_renderers[i][j].render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.8f, 0.3f));
+    m_cubeRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.3f, 0.8f));
 }
 
 void TestJoint::onImGuiRender()

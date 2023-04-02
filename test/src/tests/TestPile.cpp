@@ -3,8 +3,9 @@
 #include <cstdlib>
 #include <ctime>
 
-TestPile::TestPile()
-    : m_box{
+TestPile::TestPile(Shader &shader)
+    : TestBase(shader),
+      m_box{
           {glm::vec3(16.f, 0.5f, 10.f)}, // bottom
           {glm::vec3(16.f, 4.f, 0.5f)},  // front
           {glm::vec3(16.f, 4.f, 0.5f)},  // back
@@ -133,14 +134,14 @@ void TestPile::onRender(int viewportWidth, int viewportHeight)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (size_t i = 0; i < 5; ++i)
-        m_renderers[i].render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.3f, 0.8f));
+        m_renderers[i].render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f, 0.3f, 0.8f));
     for (size_t i = 5; i < m_rigidbodyCount; ++i)
     {
         auto r = m_rigidbodies[i - 5];
         float Ek = 0.5f * r->mass() * glm::dot(r->velocity(), r->velocity()) +
                    0.5f * glm::dot(r->angularVelocity(), r->inertia() * r->angularVelocity());
         float red = 1.f - glm::exp(-0.1f * Ek);
-        m_renderers[i].render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f + 0.8f * red, 0.6f * (1.f - red), 0.2f));
+        m_renderers[i].render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f + 0.8f * red, 0.6f * (1.f - red), 0.2f));
     }
 }
 

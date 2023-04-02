@@ -14,7 +14,7 @@ public:
     virtual void onRender(int viewportWidth, int viewportHeight) override;
     virtual void onImGuiRender() override;
 
-    TestPyramid();
+    TestPyramid(Shader &);
 
 private:
     rbd3d::DynamicWorld m_world;

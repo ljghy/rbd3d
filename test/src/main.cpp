@@ -117,6 +117,7 @@ int main()
         // Our state
         ImVec4 clear_color = ImVec4(0.2f, 0.6f, 1.0f, 0.5f);
 
+        TestManager::initShader();
         TestManager::registTest<TestCollisionDetection>("Collision Detection");
         TestManager::registTest<TestPyramid>("Pyramid");
         TestManager::registTest<TestPile>("Pile");

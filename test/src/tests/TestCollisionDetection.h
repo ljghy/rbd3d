@@ -15,7 +15,7 @@ public:
     virtual void onRender(int viewportWidth, int viewportHeight) override;
     virtual void onImGuiRender() override;
 
-    TestCollisionDetection();
+    TestCollisionDetection(Shader &);
 
 private:
     rbd3d::Capsule m_cube;

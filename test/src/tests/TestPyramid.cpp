@@ -1,10 +1,11 @@
 #include "TestPyramid.h"
 #include <imgui.h>
 
-TestPyramid::TestPyramid()
-    : m_ground(glm::vec3(40.f, 0.5f, 20.f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, -0.25f, 0.f)),
+TestPyramid::TestPyramid(Shader &shader)
+    : TestBase(shader),
+      m_ground(glm::vec3(40.f, 0.5f, 20.f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, -0.25f, 0.f)),
       m_wall(glm::vec3(40.f, 20.f, 0.5f), 0.f, 0.5f, 0.5f, glm::vec3(0.f, 10.f, -5.f)),
-      m_sphere(0.5f, 10.f)
+      m_sphere(1.f, 10.f)
 {
     m_wall.setType(rbd3d::RigidbodyType::STATIC);
     m_ground.setType(rbd3d::RigidbodyType::STATIC);
@@ -77,11 +78,11 @@ void TestPyramid::onRender(int viewportWidth, int viewportHeight)
             float Ek = 0.5f * m_cube[k].mass() * glm::dot(m_cube[k].velocity(), m_cube[k].velocity()) +
                        0.5f * glm::dot(m_cube[k].angularVelocity(), m_cube[k].inertia() * m_cube[k].angularVelocity());
             float r = 1.f - glm::exp(-Ek);
-            m_cubeRenderer[k].render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f + 0.8f * r, 0.6f * (1.f - r), 0.2f));
+            m_cubeRenderer[k].render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.2f + 0.8f * r, 0.6f * (1.f - r), 0.2f));
         }
-    m_groundRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.1f, 0.3f, 0.5f));
-    m_wallRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.1f, 0.3f, 0.5f));
-    m_sphereRenderer.render(viewportWidth, viewportHeight, m_camera, glm::vec3(0.8f, 1.f, 0.2f));
+    m_groundRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.1f, 0.3f, 0.5f));
+    m_wallRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.1f, 0.3f, 0.5f));
+    m_sphereRenderer.render(m_baseShader, viewportWidth, viewportHeight, m_camera, glm::vec3(0.8f, 1.f, 0.2f));
 }
 
 void TestPyramid::onImGuiRender()
