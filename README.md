@@ -1,5 +1,7 @@
 # Rigidbody Dynamics in 3D
 
+![Pyramid](https://github.com/ljghy/rbd3d/blob/master/res/pyramid.gif)
+
 ```
 git clone --recursive https://github.com/ljghy/rbd3d.git
 ```
